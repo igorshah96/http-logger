@@ -24,7 +24,7 @@
         :data="logs"
         :columns="columns"
         class="w-full"
-        @select="selectLog"
+        :on-select="onRowClick"
       />
     </div>
 
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, h } from 'vue';
 import { useWebSocket } from '@vueuse/core';
 import type { LogEntry, WsServerMessage } from '../../shared/types';
 import { UBadge, UButton, UTable } from '#components';
@@ -97,19 +97,23 @@ const columns = [
   {
     accessorKey: 'request.timestamp',
     header: 'Timestamp',
-    cell: ({ row }: any) => new Date(row.original.request.timestamp).toLocaleTimeString(),
+    cell: ({ row }: any) => {
+      const ts = row.original.request?.timestamp;
+      return ts ? new Date(ts).toLocaleTimeString() : '-';
+    },
   },
 ];
 
-function selectLog(log: LogEntry) {
-  selectedLog.value = log;
+function onRowClick(_: any, row: any) {
+  selectedLog.value = row.original;
 }
 
 function clearLogs() {
   send('CLEAR_LOGS');
 }
 
-function getMethodColor(method: string) {
+function getMethodColor(method: string | undefined) {
+  if (!method) return 'neutral';
   const m = method.toUpperCase();
   if (m === 'GET') return 'info';
   if (m === 'POST') return 'success';
@@ -118,7 +122,8 @@ function getMethodColor(method: string) {
   return 'neutral';
 }
 
-function getStatusColor(status: number) {
+function getStatusColor(status: number | undefined) {
+  if (status === undefined) return 'text-muted';
   if (status >= 200 && status < 300) return 'text-success';
   if (status >= 400) return 'text-error';
   if (status >= 300) return 'text-warning';

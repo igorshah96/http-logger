@@ -17,7 +17,7 @@
           <div class="flex items-center gap-4 text-xs text-muted">
             <span :class="getStatusColor(log.status)">Status: {{ log.status }}</span>
             <span>Duration: {{ log.duration }}ms</span>
-            <span>{{ new Date(log.request.timestamp).toLocaleString() }}</span>
+            <span v-if="log.request?.timestamp">{{ new Date(log.request.timestamp).toLocaleString() }}</span>
           </div>
         </div>
 
@@ -67,7 +67,8 @@ const tabs = [
   { label: 'Response Body', slot: 'response-body' },
 ];
 
-function getMethodColor(method: string) {
+function getMethodColor(method: string | undefined) {
+  if (!method) return 'neutral';
   const m = method.toUpperCase();
   if (m === 'GET') return 'info';
   if (m === 'POST') return 'success';
@@ -76,7 +77,8 @@ function getMethodColor(method: string) {
   return 'neutral';
 }
 
-function getStatusColor(status: number) {
+function getStatusColor(status: number | undefined) {
+  if (status === undefined) return 'text-muted';
   if (status >= 200 && status < 300) return 'text-success';
   if (status >= 400) return 'text-error';
   if (status >= 300) return 'text-warning';
