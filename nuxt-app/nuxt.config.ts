@@ -1,13 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@nuxt/ui'],
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt'],
 
   imports: {
-    autoImport: false,
+    // autoImport: false,
   },
 
   devtools: {
     enabled: true,
+  },
+
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
   },
 
   css: ['~/assets/css/main.css'],

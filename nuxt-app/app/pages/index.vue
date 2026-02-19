@@ -1,106 +1,127 @@
 <template>
-  <div>
-    <UPageHero
-      title="Nuxt Starter Template"
-      description="A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours."
-      :links="[
-        {
-          label: 'Get started',
-          to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-          target: '_blank',
-          trailingIcon: 'i-lucide-arrow-right',
-          size: 'xl',
-        },
-        {
-          label: 'Use this template',
-          to: 'https://github.com/nuxt-ui-templates/starter',
-          target: '_blank',
-          icon: 'i-simple-icons-github',
-          size: 'xl',
-          color: 'neutral',
-          variant: 'subtle',
-        },
-      ]"
-    />
+  <div class="h-full flex flex-col p-4">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <h1 class="text-xl font-bold">HTTP Logs</h1>
+        <UBadge :color="status === 'OPEN' ? 'success' : 'error'" variant="subtle" size="sm">
+          {{ status }}
+        </UBadge>
+      </div>
+      <div class="flex items-center gap-2">
+        <UButton
+          icon="i-lucide-trash"
+          label="Clear Logs"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          @click="clearLogs"
+        />
+      </div>
+    </div>
 
-    <UPageSection
-      id="features"
-      title="Everything you need to build modern Nuxt apps"
-      description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
-      :features="[
-        {
-          icon: 'i-lucide-rocket',
-          title: 'Production-ready from day one',
-          description:
-            'Pre-configured with TypeScript, ESLint, Tailwind CSS, and all the best practices. Focus on building features, not setting up tooling.',
-        },
-        {
-          icon: 'i-lucide-palette',
-          title: 'Beautiful by default',
-          description:
-            'Leveraging Nuxt UI\'s design system with automatic dark mode, consistent spacing, and polished components that look great out of the box.',
-        },
-        {
-          icon: 'i-lucide-zap',
-          title: 'Lightning fast',
-          description:
-            'Optimized for performance with SSR/SSG support, automatic code splitting, and edge-ready deployment. Your users will love the speed.',
-        },
-        {
-          icon: 'i-lucide-blocks',
-          title: '100+ components included',
-          description:
-            'Access Nuxt UI\'s comprehensive component library. From forms to navigation, everything is accessible, responsive, and customizable.',
-        },
-        {
-          icon: 'i-lucide-code-2',
-          title: 'Developer experience first',
-          description: 'Auto-imports, hot module replacement, and TypeScript support. Write less boilerplate and ship more features.',
-        },
-        {
-          icon: 'i-lucide-shield-check',
-          title: 'Built for scale',
-          description: 'Enterprise-ready architecture with proper error handling, SEO optimization, and security best practices built-in.',
-        },
-      ]"
-    />
-
-    <UPageSection>
-      <UPageCTA
-        title="Ready to build your next Nuxt app?"
-        description="Join thousands of developers building with Nuxt and Nuxt UI. Get this template and start shipping today."
-        variant="subtle"
-        :links="[
-          {
-            label: 'Start building',
-            to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-            target: '_blank',
-            trailingIcon: 'i-lucide-arrow-right',
-            color: 'neutral',
-          },
-          {
-            label: 'View on GitHub',
-            to: 'https://github.com/nuxt-ui-templates/starter',
-            target: '_blank',
-            icon: 'i-simple-icons-github',
-            color: 'neutral',
-            variant: 'outline',
-          },
-        ]"
+    <div class="flex-1 overflow-auto border border-muted rounded-lg">
+      <UTable
+        :data="logs"
+        :columns="columns"
+        class="w-full"
+        @select="selectLog"
       />
-    </UPageSection>
+    </div>
+
+    <LogDetails v-model:log="selectedLog" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, useFetch } from '#imports';
+import { ref, computed } from 'vue';
+import { useWebSocket } from '@vueuse/core';
+import type { LogEntry, WsServerMessage } from '../../shared/types';
+import { UBadge, UButton, UTable } from '#components';
+import LogDetails from '../components/LogDetails.vue';
 
-const { data } = await useFetch('/api/test');
+const logs = ref<LogEntry[]>([]);
+const selectedLog = ref<LogEntry | null>(null);
 
-onMounted(async () => {
-  const a = $fetch('/api/test');
-  const b = await $fetch('/api/test/hello');
-  console.log('data', data.value);
-  console.log('123');
+const { status, send } = useWebSocket('/_ws', {
+  autoReconnect: true,
+  onMessage: (_, event) => {
+    try {
+      const message: WsServerMessage = JSON.parse(event.data);
+      if (message.type === 'INITIAL_STATE') {
+        logs.value = message.payload;
+      } else if (message.type === 'LOG_ADDED') {
+        logs.value.unshift(message.payload);
+        if (logs.value.length > 1000) {
+          logs.value.pop();
+        }
+      } else if (message.type === 'LOGS_CLEARED') {
+        logs.value = [];
+      }
+    } catch (e) {
+      console.error('Failed to parse WS message', e);
+    }
+  },
 });
+
+const columns = [
+  {
+    accessorKey: 'method',
+    header: 'Method',
+    cell: ({ row }: any) => {
+      const method = row.original.method as string;
+      return h(UBadge, {
+        color: getMethodColor(method),
+        variant: 'subtle',
+        label: method,
+      });
+    },
+  },
+  {
+    accessorKey: 'url',
+    header: 'URL',
+    cell: ({ row }: any) => h('span', { class: 'truncate max-w-md block font-mono text-xs' }, row.original.url),
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }: any) => {
+      const status = row.original.status as number;
+      return h('span', { class: getStatusColor(status) }, status);
+    },
+  },
+  {
+    accessorKey: 'duration',
+    header: 'Time',
+    cell: ({ row }: any) => `${row.original.duration}ms`,
+  },
+  {
+    accessorKey: 'request.timestamp',
+    header: 'Timestamp',
+    cell: ({ row }: any) => new Date(row.original.request.timestamp).toLocaleTimeString(),
+  },
+];
+
+function selectLog(log: LogEntry) {
+  selectedLog.value = log;
+}
+
+function clearLogs() {
+  send('CLEAR_LOGS');
+}
+
+function getMethodColor(method: string) {
+  const m = method.toUpperCase();
+  if (m === 'GET') return 'info';
+  if (m === 'POST') return 'success';
+  if (m === 'PUT' || m === 'PATCH') return 'warning';
+  if (m === 'DELETE') return 'error';
+  return 'neutral';
+}
+
+function getStatusColor(status: number) {
+  if (status >= 200 && status < 300) return 'text-success';
+  if (status >= 400) return 'text-error';
+  if (status >= 300) return 'text-warning';
+  return 'text-muted';
+}
 </script>
