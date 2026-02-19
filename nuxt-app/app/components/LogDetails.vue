@@ -9,7 +9,7 @@
       <div v-if="log" class="flex flex-col h-full overflow-hidden">
         <div class="p-4 border-b border-muted">
           <div class="flex items-center gap-2 mb-2">
-            <UBadge :color="getMethodColor(log.method)" variant="subtle">
+            <UBadge :color="getMethodColor(log.method)" variant="subtle" class="uppercase">
               {{ log.method }}
             </UBadge>
             <span class="font-mono text-sm truncate">{{ log.url }}</span>
@@ -45,6 +45,8 @@ import { computed } from 'vue';
 import type { LogEntry } from '../../shared/types';
 import { UBadge, USlideover, UTabs } from '#components';
 
+import { getMethodColor, getStatusColor } from '../utils/colors';
+
 const props = defineProps<{
   log: LogEntry | null;
 }>();
@@ -66,24 +68,6 @@ const tabs = [
   { label: 'Response Headers', slot: 'response-headers' },
   { label: 'Response Body', slot: 'response-body' },
 ];
-
-function getMethodColor(method: string | undefined) {
-  if (!method) return 'neutral';
-  const m = method.toUpperCase();
-  if (m === 'GET') return 'info';
-  if (m === 'POST') return 'success';
-  if (m === 'PUT' || m === 'PATCH') return 'warning';
-  if (m === 'DELETE') return 'error';
-  return 'neutral';
-}
-
-function getStatusColor(status: number | undefined) {
-  if (status === undefined) return 'text-muted';
-  if (status >= 200 && status < 300) return 'text-success';
-  if (status >= 400) return 'text-error';
-  if (status >= 300) return 'text-warning';
-  return 'text-muted';
-}
 
 function formatBody(body: any) {
   if (!body) return 'Empty';

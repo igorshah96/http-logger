@@ -29,10 +29,12 @@
       >
         <template #method-cell="{ row }">
           <UBadge
-            :color="getMethodColor(row.original.method)"
+            :color="getMethodColor(row.getValue('method'))"
             variant="subtle"
-            :label="row.original.method"
-          />
+            class="uppercase"
+          >
+            {{ row.getValue('method') }}
+          </UBadge>
         </template>
 
         <template #status-cell="{ row }">
@@ -69,6 +71,8 @@ import { useWebSocket } from '@vueuse/core';
 import type { LogEntry, WsServerMessage } from '../../shared/types';
 import { UBadge, UButton, UTable } from '#components';
 import LogDetails from '../components/LogDetails.vue';
+
+import { getMethodColor, getStatusColor } from '../utils/colors';
 
 const logs = ref<LogEntry[]>([]);
 const selectedLog = ref<LogEntry | null>(null);
@@ -110,23 +114,5 @@ function onRowClick(_: any, row: any) {
 
 function clearLogs() {
   send('CLEAR_LOGS');
-}
-
-function getMethodColor(method: string | undefined) {
-  if (!method) return 'neutral';
-  const m = method.toUpperCase();
-  if (m === 'GET') return 'info';
-  if (m === 'POST') return 'success';
-  if (m === 'PUT' || m === 'PATCH') return 'warning';
-  if (m === 'DELETE') return 'error';
-  return 'neutral';
-}
-
-function getStatusColor(status: number | undefined) {
-  if (status === undefined) return 'text-muted';
-  if (status >= 200 && status < 300) return 'text-success';
-  if (status >= 400) return 'text-error';
-  if (status >= 300) return 'text-warning';
-  return 'text-muted';
 }
 </script>
