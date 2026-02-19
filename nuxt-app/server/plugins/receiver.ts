@@ -33,9 +33,10 @@ export default defineNitroPlugin(() => {
           logStorage.addLog(logEntry);
           res.statusCode = 201;
           res.end(JSON.stringify({ status: 'ok', id: logEntry.id }));
-        } catch (error: any) {
+        } catch (error) {
           res.statusCode = 400;
-          res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          res.end(JSON.stringify({ error: 'Invalid JSON', details: errorMessage }));
         }
       });
     } else {

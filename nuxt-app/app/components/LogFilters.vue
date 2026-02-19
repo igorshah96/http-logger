@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { UInput, USelectMenu, UButton, UBadge } from '#components';
-
-export interface LogFiltersState {
-  search: string;
-  methods: string[];
-  statuses: string[];
-}
+import type { LogFiltersState } from '../../shared/types';
 
 const props = defineProps<{
   modelValue: LogFiltersState

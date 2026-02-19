@@ -24,3 +24,11 @@ export type WsServerMessage =
   | { type: 'LOG_ADDED'; payload: LogEntry }
   | { type: 'LOGS_CLEARED' }
   | { type: 'INITIAL_STATE'; payload: LogEntry[] };
+
+export type WsClientMessage = 'CLEAR_LOGS';
+
+export interface LogFiltersState {
+  search: string;
+  methods: string[];
+  statuses: string[];
+}
