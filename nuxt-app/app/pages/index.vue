@@ -23,9 +23,40 @@
       <UTable
         :data="logs"
         :columns="columns"
+        :ui="{ tr: 'cursor-pointer hover:bg-elevated/50' }"
         class="w-full"
         :on-select="onRowClick"
-      />
+      >
+        <template #method-cell="{ row }">
+          <UBadge
+            :color="getMethodColor(row.original.method)"
+            variant="subtle"
+            :label="row.original.method"
+          />
+        </template>
+
+        <template #status-cell="{ row }">
+          <span :class="getStatusColor(row.original.status)" class="font-mono">
+            {{ row.original.status }}
+          </span>
+        </template>
+
+        <template #url-cell="{ row }">
+          <span class="truncate max-w-md block font-mono text-xs" :title="row.original.url">
+            {{ row.original.url }}
+          </span>
+        </template>
+
+        <template #duration-cell="{ row }">
+          <span class="text-xs text-muted">{{ row.original.duration }}ms</span>
+        </template>
+
+        <template #request-timestamp-cell="{ row }">
+          <span class="text-xs text-muted">
+            {{ row.original.request?.timestamp ? new Date(row.original.request.timestamp).toLocaleTimeString() : '-' }}
+          </span>
+        </template>
+      </UTable>
     </div>
 
     <LogDetails v-model:log="selectedLog" />
@@ -33,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from 'vue';
+import { ref } from 'vue';
 import { useWebSocket } from '@vueuse/core';
 import type { LogEntry, WsServerMessage } from '../../shared/types';
 import { UBadge, UButton, UTable } from '#components';
@@ -47,6 +78,7 @@ const { status, send } = useWebSocket('/_ws', {
   onMessage: (_, event) => {
     try {
       const message: WsServerMessage = JSON.parse(event.data);
+      console.log('[WS] Received message:', message);
       if (message.type === 'INITIAL_STATE') {
         logs.value = message.payload;
       } else if (message.type === 'LOG_ADDED') {
@@ -64,47 +96,15 @@ const { status, send } = useWebSocket('/_ws', {
 });
 
 const columns = [
-  {
-    accessorKey: 'method',
-    header: 'Method',
-    cell: ({ row }: any) => {
-      const method = row.original.method as string;
-      return h(UBadge, {
-        color: getMethodColor(method),
-        variant: 'subtle',
-        label: method,
-      });
-    },
-  },
-  {
-    accessorKey: 'url',
-    header: 'URL',
-    cell: ({ row }: any) => h('span', { class: 'truncate max-w-md block font-mono text-xs' }, row.original.url),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }: any) => {
-      const status = row.original.status as number;
-      return h('span', { class: getStatusColor(status) }, status);
-    },
-  },
-  {
-    accessorKey: 'duration',
-    header: 'Time',
-    cell: ({ row }: any) => `${row.original.duration}ms`,
-  },
-  {
-    accessorKey: 'request.timestamp',
-    header: 'Timestamp',
-    cell: ({ row }: any) => {
-      const ts = row.original.request?.timestamp;
-      return ts ? new Date(ts).toLocaleTimeString() : '-';
-    },
-  },
+  { accessorKey: 'method', header: 'Method' },
+  { accessorKey: 'url', header: 'URL' },
+  { accessorKey: 'status', header: 'Status' },
+  { accessorKey: 'duration', header: 'Time' },
+  { accessorKey: 'request.timestamp', header: 'Timestamp' }
 ];
 
 function onRowClick(_: any, row: any) {
+  console.log('[Table] Row clicked:', row.original);
   selectedLog.value = row.original;
 }
 

@@ -23,16 +23,16 @@
 
         <UTabs :items="tabs" class="flex-1 overflow-hidden" :ui="{ content: 'p-4 overflow-auto h-full' }">
           <template #request-headers>
-            <pre class="text-xs font-mono">{{ JSON.stringify(log.request.headers, null, 2) }}</pre>
+            <pre class="text-xs font-mono">{{ JSON.stringify(log.request?.headers, null, 2) }}</pre>
           </template>
           <template #request-body>
-            <pre class="text-xs font-mono">{{ formatBody(log.request.body) }}</pre>
+            <pre class="text-xs font-mono">{{ formatBody(log.request?.body) }}</pre>
           </template>
           <template #response-headers>
-            <pre class="text-xs font-mono">{{ JSON.stringify(log.response.headers, null, 2) }}</pre>
+            <pre class="text-xs font-mono">{{ JSON.stringify(log.response?.headers, null, 2) }}</pre>
           </template>
           <template #response-body>
-            <pre class="text-xs font-mono">{{ formatBody(log.response.body) }}</pre>
+            <pre class="text-xs font-mono">{{ formatBody(log.response?.body) }}</pre>
           </template>
         </UTabs>
       </div>
@@ -86,6 +86,7 @@ function getStatusColor(status: number | undefined) {
 }
 
 function formatBody(body: any) {
+  if (!body) return 'Empty';
   if (typeof body === 'string') {
     try {
       return JSON.stringify(JSON.parse(body), null, 2);
