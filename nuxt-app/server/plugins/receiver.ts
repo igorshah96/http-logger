@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { logStorage } from '../utils/storage';
-import { ExternalLogPayload, LogEntry } from '../../shared/types';
+import { transformLog } from '../utils/transformers';
+import type { LogEntry } from '../../shared/types';
 import { randomUUID } from 'node:crypto';
 import { defineNitroPlugin } from '#imports';
 
@@ -25,7 +26,8 @@ export default defineNitroPlugin(() => {
       });
       req.on('end', () => {
         try {
-          const payload = JSON.parse(body) as ExternalLogPayload;
+          const rawPayload = JSON.parse(body);
+          const payload = transformLog(rawPayload);
           const logEntry: LogEntry = {
             ...payload,
             id: randomUUID(),

@@ -19,6 +19,12 @@
             <span>Duration: {{ log.duration }}ms</span>
             <span v-if="log.request?.timestamp">{{ new Date(log.request.timestamp).toLocaleString() }}</span>
           </div>
+          <div v-if="log.userId || log.traceId || log.bffPath" class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground/60 font-mono">
+            <span v-if="log.userId" title="User ID">UID: {{ log.userId }}</span>
+            <span v-if="log.traceId" title="Trace ID">TID: {{ log.traceId }}</span>
+            <span v-if="log.bffPath" title="BFF Path">BFF: {{ log.bffPath }}</span>
+            <span v-if="log.source" title="Source">SRC: {{ log.source }}</span>
+          </div>
         </div>
 
         <UTabs :items="tabs" class="flex-1 overflow-hidden" :ui="{ content: 'p-4 overflow-auto h-full' }">
