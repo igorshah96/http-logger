@@ -10,10 +10,19 @@ export type Transformer = (payload: any) => ExternalLogPayload | null
  */
 export const defaultTransformer: Transformer = (payload) => {
   if (payload && typeof payload === 'object' && 'method' in payload && 'url' in payload && 'status' in payload) {
-    return {
+    const base = {
       ...payload,
-      source: payload.source || 'default'
+      source: (payload as any).source || 'default'
     } as ExternalLogPayload
+
+    if ('axiosRequests' in payload && (payload as any).axiosRequests) {
+      base.meta = {
+        ...(base.meta || {}),
+        axiosRequests: (payload as any).axiosRequests
+      }
+    }
+
+    return base
   }
   return null
 }
@@ -22,7 +31,11 @@ export const defaultTransformer: Transformer = (payload) => {
  * Transformer for the CustomLoggerInfo format from external-utils.
  */
 export const customLoggerTransformer: Transformer = (payload) => {
-  if (payload && typeof payload === 'object' && 'bffPath' in payload) {
+  if (
+    payload &&
+    typeof payload === 'object' &&
+    ('bffPath' in payload || 'axiosRequests' in payload || 'logDetails' in payload)
+  ) {
     const p = payload as any
 
     // Normalize headers if they are not plain objects (though in JSON they should be)
