@@ -53,7 +53,11 @@ export const customLoggerTransformer: Transformer = (payload) => {
       userId: p.userId,
       traceId: p.traceId,
       bffPath: p.bffPath,
-      source: 'custom-logger'
+      source: 'custom-logger',
+      meta: {
+        logDetails: p.logDetails,
+        axiosRequests: p.axiosRequests
+      }
     }
   }
   return null

@@ -1,3 +1,13 @@
+export interface AxiosRequestMeta {
+  url: string
+  params: string
+  code: number
+  message?: string
+  body?: unknown
+  data?: unknown
+  timestamp: number
+}
+
 export interface ExternalLogPayload {
   method: string
   url: string
@@ -19,6 +29,14 @@ export interface ExternalLogPayload {
   traceId?: string
   bffPath?: string
   source?: string
+  /**
+   * Дополнительные данные, специфичные для источника.
+   * Для CustomLoggerInfo сюда попадают logDetails, axiosRequests и т.п.
+   */
+  meta?: {
+    logDetails?: Array<string | Record<string, any>>
+    axiosRequests?: Array<AxiosRequestMeta>
+  }
 }
 
 export interface LogEntry extends ExternalLogPayload {
