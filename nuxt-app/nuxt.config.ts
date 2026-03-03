@@ -7,29 +7,29 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: true,
-  },
-
-  nitro: {
-    experimental: {
-      websocket: true,
-    },
+    enabled: true
   },
 
   css: ['~/assets/css/main.css'],
 
   routeRules: {
-    '/': { prerender: true },
+    '/': { prerender: true }
   },
 
   compatibilityDate: '2025-01-15',
+
+  nitro: {
+    experimental: {
+      websocket: true
+    }
+  },
 
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs',
-      },
-    },
-  },
-});
+        braceStyle: '1tbs'
+      }
+    }
+  }
+})

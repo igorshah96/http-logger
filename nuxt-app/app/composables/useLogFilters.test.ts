@@ -1,7 +1,7 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-import type { LogEntry } from '../../shared/types';
-import { useLogFilters } from './useLogFilters';
+import type { LogEntry } from '../../shared/types'
+import { useLogFilters } from './useLogFilters'
 
 function createLog(partial: Partial<LogEntry> = {}): LogEntry {
   return {
@@ -22,7 +22,7 @@ function createLog(partial: Partial<LogEntry> = {}): LogEntry {
       timestamp: Date.now()
     },
     ...partial
-  };
+  }
 }
 
 describe('useLogFilters', () => {
@@ -30,16 +30,15 @@ describe('useLogFilters', () => {
     const logs = ref<LogEntry[]>([
       createLog({ id: '1', url: '/users', method: 'GET', status: 200 }),
       createLog({ id: '2', url: '/admin', method: 'POST', status: 500 })
-    ]);
+    ])
 
-    const { filters, filteredLogs } = useLogFilters(logs);
+    const { filters, filteredLogs } = useLogFilters(logs)
 
-    filters.value.search = 'admin';
-    filters.value.methods = ['POST'];
-    filters.value.statuses = ['5'];
+    filters.value.search = 'admin'
+    filters.value.methods = ['POST']
+    filters.value.statuses = ['5']
 
-    expect(filteredLogs.value).toHaveLength(1);
-    expect(filteredLogs.value[0].id).toBe('2');
-  });
-});
-
+    expect(filteredLogs.value).toHaveLength(1)
+    expect(filteredLogs.value[0].id).toBe('2')
+  })
+})

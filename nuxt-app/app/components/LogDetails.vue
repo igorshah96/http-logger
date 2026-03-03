@@ -6,10 +6,17 @@
     :ui="{ body: 'p-0' }"
   >
     <template #body>
-      <div v-if="log" class="flex flex-col h-full overflow-hidden">
+      <div
+        v-if="log"
+        class="flex flex-col h-full overflow-hidden"
+      >
         <div class="p-4 border-b border-muted">
           <div class="flex items-center gap-2 mb-2">
-            <UBadge :color="getMethodColor(log.method)" variant="subtle" class="uppercase">
+            <UBadge
+              :color="getMethodColor(log.method)"
+              variant="subtle"
+              class="uppercase"
+            >
               {{ log.method }}
             </UBadge>
             <span class="font-mono text-sm truncate">{{ log.url }}</span>
@@ -19,15 +26,34 @@
             <span>Duration: {{ log.duration }}ms</span>
             <span v-if="log.request?.timestamp">{{ formatDateTime(log.request.timestamp) }}</span>
           </div>
-          <div v-if="log.userId || log.traceId || log.bffPath" class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground/60 font-mono">
-            <span v-if="log.userId" title="User ID">UID: {{ log.userId }}</span>
-            <span v-if="log.traceId" title="Trace ID">TID: {{ log.traceId }}</span>
-            <span v-if="log.bffPath" title="BFF Path">BFF: {{ log.bffPath }}</span>
-            <span v-if="log.source" title="Source">SRC: {{ log.source }}</span>
+          <div
+            v-if="log.userId || log.traceId || log.bffPath"
+            class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground/60 font-mono"
+          >
+            <span
+              v-if="log.userId"
+              title="User ID"
+            >UID: {{ log.userId }}</span>
+            <span
+              v-if="log.traceId"
+              title="Trace ID"
+            >TID: {{ log.traceId }}</span>
+            <span
+              v-if="log.bffPath"
+              title="BFF Path"
+            >BFF: {{ log.bffPath }}</span>
+            <span
+              v-if="log.source"
+              title="Source"
+            >SRC: {{ log.source }}</span>
           </div>
         </div>
 
-        <UTabs :items="tabs" class="flex-1 overflow-hidden" :ui="{ content: 'p-4 overflow-auto h-full' }">
+        <UTabs
+          :items="tabs"
+          class="flex-1 overflow-hidden"
+          :ui="{ content: 'p-4 overflow-auto h-full' }"
+        >
           <template #request-headers>
             <pre class="text-xs font-mono">{{ JSON.stringify(log.request?.headers, null, 2) }}</pre>
           </template>
@@ -47,44 +73,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { LogEntry } from '../../shared/types';
-import { UBadge, USlideover, UTabs } from '#components';
+import { computed } from 'vue'
+import type { LogEntry } from '../../shared/types'
+import { UBadge, USlideover, UTabs } from '#components'
 
-import { getMethodColor, getStatusColor } from '../utils/colors';
-import { formatDateTime } from '../utils/format';
+import { getMethodColor, getStatusColor } from '../utils/colors'
+import { formatDateTime } from '../utils/format'
 
 const props = defineProps<{
-  log: LogEntry | null;
-}>();
+  log: LogEntry | null
+}>()
 
 const emit = defineEmits<{
-  'update:log': [value: LogEntry | null];
-}>();
+  'update:log': [value: LogEntry | null]
+}>()
 
 const isOpen = computed({
   get: () => !!props.log,
   set: (value) => {
-    if (!value) emit('update:log', null);
-  },
-});
+    if (!value) emit('update:log', null)
+  }
+})
 
 const tabs = [
   { label: 'Request Headers', slot: 'request-headers' },
   { label: 'Request Body', slot: 'request-body' },
   { label: 'Response Headers', slot: 'response-headers' },
-  { label: 'Response Body', slot: 'response-body' },
-];
+  { label: 'Response Body', slot: 'response-body' }
+]
 
 function formatBody(body: any) {
-  if (!body) return 'Empty';
+  if (!body) return 'Empty'
   if (typeof body === 'string') {
     try {
-      return JSON.stringify(JSON.parse(body), null, 2);
+      return JSON.stringify(JSON.parse(body), null, 2)
     } catch {
-      return body;
+      return body
     }
   }
-  return JSON.stringify(body, null, 2);
+  return JSON.stringify(body, null, 2)
 }
 </script>

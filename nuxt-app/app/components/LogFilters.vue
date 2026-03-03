@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { UInput, USelectMenu, UButton, UBadge } from '#components';
-import type { LogFiltersState } from '../../shared/types';
+import { computed } from 'vue'
+import { UInput, USelectMenu, UButton, UBadge } from '#components'
+import type { LogFiltersState } from '../../shared/types'
 
 const props = defineProps<{
   modelValue: LogFiltersState
-}>();
+}>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: LogFiltersState): void
-}>();
+}>()
 
 const filters = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
-});
+  set: val => emit('update:modelValue', val)
+})
 
 // Удобное объявление фильтров в одном месте
 const FILTER_CONFIG = {
@@ -33,34 +33,34 @@ const FILTER_CONFIG = {
     { label: '4xx Client Error', value: '4' },
     { label: '5xx Server Error', value: '5' }
   ]
-};
+}
 
 function reset() {
   emit('update:modelValue', {
     search: '',
     methods: [],
     statuses: []
-  });
+  })
 }
 
 const hasFilters = computed(() => {
-  return filters.value.search || filters.value.methods.length > 0 || filters.value.statuses.length > 0;
-});
+  return filters.value.search || filters.value.methods.length > 0 || filters.value.statuses.length > 0
+})
 
 // Хелперы для отображения выбранных значений
 const methodsLabel = computed(() => {
-  if (filters.value.methods.length === 0) return 'All Methods';
-  if (filters.value.methods.length === 1) return filters.value.methods[0];
-  return `Methods (${filters.value.methods.length})`;
-});
+  if (filters.value.methods.length === 0) return 'All Methods'
+  if (filters.value.methods.length === 1) return filters.value.methods[0]
+  return `Methods (${filters.value.methods.length})`
+})
 
 const statusesLabel = computed(() => {
-  if (filters.value.statuses.length === 0) return 'All Statuses';
+  if (filters.value.statuses.length === 0) return 'All Statuses'
   if (filters.value.statuses.length === 1) {
-    return FILTER_CONFIG.statuses.find(s => s.value === filters.value.statuses[0])?.label || '1 selected';
+    return FILTER_CONFIG.statuses.find(s => s.value === filters.value.statuses[0])?.label || '1 selected'
   }
-  return `Statuses (${filters.value.statuses.length})`;
-});
+  return `Statuses (${filters.value.statuses.length})`
+})
 </script>
 
 <template>
@@ -121,7 +121,10 @@ const statusesLabel = computed(() => {
       </USelectMenu>
     </div>
 
-    <div v-if="hasFilters" class="flex items-center gap-2 ml-auto">
+    <div
+      v-if="hasFilters"
+      class="flex items-center gap-2 ml-auto"
+    >
       <UButton
         icon="i-lucide-x"
         label="Reset Filters"

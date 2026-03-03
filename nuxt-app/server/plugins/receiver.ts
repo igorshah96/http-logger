@@ -1,4 +1,4 @@
-import { defineNitroPlugin } from '#imports';
+import { defineNitroPlugin } from '#imports'
 
 /**
  * Исторически приёмник логов работал как отдельный node:http сервер на порту 4444.
@@ -8,4 +8,4 @@ import { defineNitroPlugin } from '#imports';
  */
 export default defineNitroPlugin(() => {
   // no-op
-});
+})

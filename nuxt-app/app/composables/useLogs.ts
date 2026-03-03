@@ -1,33 +1,32 @@
-import { ref } from 'vue';
-import { useWebSocket } from '@vueuse/core';
-import type { LogEntry, WsServerMessage, WsClientMessage } from '../../shared/types';
+import { ref } from 'vue'
+import { useWebSocket } from '@vueuse/core'
+import type { LogEntry, WsServerMessage, WsClientMessage } from '../../shared/types'
 
-import { applyLogsServerMessage } from '../utils/wsProtocol';
+import { applyLogsServerMessage } from '../utils/wsProtocol'
 
 export function useLogs() {
-  const logs = ref<LogEntry[]>([]);
+  const logs = ref<LogEntry[]>([])
 
   const { status, send } = useWebSocket('/_ws', {
     autoReconnect: true,
     onMessage: (_, event) => {
       try {
-        const message: WsServerMessage = JSON.parse(event.data);
-        applyLogsServerMessage(logs, message);
+        const message: WsServerMessage = JSON.parse(event.data)
+        applyLogsServerMessage(logs, message)
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to parse WS message', e);
+        console.error('Failed to parse WS message', e)
       }
-    },
-  });
+    }
+  })
 
   const clearLogs = () => {
-    const msg: WsClientMessage = { type: 'CLEAR_LOGS' };
-    send(JSON.stringify(msg));
-  };
+    const msg: WsClientMessage = { type: 'CLEAR_LOGS' }
+    send(JSON.stringify(msg))
+  }
 
   return {
     logs,
     status,
     clearLogs
-  };
+  }
 }

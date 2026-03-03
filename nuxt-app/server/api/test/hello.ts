@@ -1,7 +1,7 @@
-import { defineEventHandler } from '#imports';
+import { defineEventHandler } from '#imports'
 
 export default defineEventHandler((event) => {
   return {
-    hello: 'world',
-  };
-});
+    hello: 'world'
+  }
+})

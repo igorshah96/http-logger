@@ -1,5 +1,5 @@
-import type { LogEntry } from '../../shared/types';
-import { logStorage } from './storage';
+import type { LogEntry } from '../../shared/types'
+import { logStorage } from './storage'
 
 describe('logStorage', () => {
   it('adds logs and respects max size', () => {
@@ -19,23 +19,23 @@ describe('logStorage', () => {
         body: null,
         timestamp: Date.now()
       }
-    };
-
-    for (let i = 0; i < 5; i += 1) {
-      logStorage.addLog({ ...base, id: String(i) });
     }
 
-    const logs = logStorage.getLogs();
-    expect(logs).toHaveLength(5);
-    expect(logs[0].id).toBe('4');
-  });
+    for (let i = 0; i < 5; i += 1) {
+      logStorage.addLog({ ...base, id: String(i) })
+    }
+
+    const logs = logStorage.getLogs()
+    expect(logs).toHaveLength(5)
+    expect(logs[0].id).toBe('4')
+  })
 
   it('emits events for add/clear', () => {
-    const addedSpy = vi.fn();
-    const clearedSpy = vi.fn();
+    const addedSpy = vi.fn()
+    const clearedSpy = vi.fn()
 
-    const unsubscribeAdded = logStorage.onLogAdded(addedSpy);
-    const unsubscribeCleared = logStorage.onLogsCleared(clearedSpy);
+    const unsubscribeAdded = logStorage.onLogAdded(addedSpy)
+    const unsubscribeCleared = logStorage.onLogsCleared(clearedSpy)
 
     const log = {
       id: '1',
@@ -54,16 +54,15 @@ describe('logStorage', () => {
         body: null,
         timestamp: Date.now()
       }
-    } satisfies LogEntry;
+    } satisfies LogEntry
 
-    logStorage.addLog(log);
-    logStorage.clearLogs();
+    logStorage.addLog(log)
+    logStorage.clearLogs()
 
-    unsubscribeAdded();
-    unsubscribeCleared();
+    unsubscribeAdded()
+    unsubscribeCleared()
 
-    expect(addedSpy).toHaveBeenCalledTimes(1);
-    expect(clearedSpy).toHaveBeenCalledTimes(1);
-  });
-});
-
+    expect(addedSpy).toHaveBeenCalledTimes(1)
+    expect(clearedSpy).toHaveBeenCalledTimes(1)
+  })
+})
