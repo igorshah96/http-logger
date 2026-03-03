@@ -68,6 +68,10 @@
           <template #response-body>
             <pre class="text-xs font-mono">{{ formatBody(log.response?.body) }}</pre>
           </template>
+
+          <template #axios v-if="axiosLog">
+            <pre class="text-xs font-mono">{{ formatBody(axiosLog) }}</pre>
+          </template>
         </UTabs>
       </div>
     </template>
@@ -76,7 +80,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { LogEntry } from '../../shared/types'
+import type { AxiosRequestMeta, LogEntry } from '../../shared/types'
 import { UBadge, USlideover, UTabs } from '#components'
 
 import { getMethodColor, getStatusColor } from '../utils/colors'
@@ -84,6 +88,7 @@ import { formatDateTime } from '../utils/format'
 
 const props = defineProps<{
   log: LogEntry | null
+  axiosLog: AxiosRequestMeta
 }>()
 
 const emit = defineEmits<{
@@ -100,7 +105,8 @@ const isOpen = computed({
 const tabs = [
   { label: 'Headers', slot: 'headers' },
   { label: 'Body', slot: 'request-body' },
-  { label: 'Response', slot: 'response-body' }
+  { label: 'Response', slot: 'response-body' },
+  { label: 'Axios Response', slot: 'axios' }
 ]
 
 function formatBody(body: any) {

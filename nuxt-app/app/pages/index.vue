@@ -2,9 +2,7 @@
   <div class="h-full flex flex-col p-4">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
-        <h1 class="text-xl font-bold">
-          HTTP Logs
-        </h1>
+        <h1 class="text-xl font-bold">HTTP Logs</h1>
         <UBadge
           :color="status === 'OPEN' ? 'success' : 'error'"
           variant="subtle"
@@ -127,44 +125,46 @@
       </UTable>
     </div>
 
-    <LogDetails v-model:log="selectedLog" />
+    <LogDetails v-model:log="selectedLog" :axios-log="selectedAxiosLog"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { LogEntry } from '../../shared/types'
-import { UBadge, UButton, UIcon, UTable } from '#components'
-import LogDetails from '../components/LogDetails.vue'
-import LogFilters from '../components/LogFilters.vue'
-import { getMethodColor, getStatusColor } from '../utils/colors'
-import { formatTime } from '../utils/format'
+import { ref } from 'vue';
+import type { AxiosRequestMeta, LogEntry } from '../../shared/types';
+import { UBadge, UButton, UIcon, UTable } from '#components';
+import LogDetails from '../components/LogDetails.vue';
+import LogFilters from '../components/LogFilters.vue';
+import { getMethodColor, getStatusColor } from '../utils/colors';
+import { formatTime } from '../utils/format';
 
 // Composables
-import { useLogs } from '../composables/useLogs'
-import { useLogFilters } from '../composables/useLogFilters'
-import { useGroupedLogs, type GroupedRow } from '../composables/useGroupedLogs'
+import { useLogs } from '../composables/useLogs';
+import { useLogFilters } from '../composables/useLogFilters';
+import { useGroupedLogs, type GroupedRow } from '../composables/useGroupedLogs';
 
-const { logs, status, clearLogs } = useLogs()
-const { filters, filteredLogs } = useLogFilters(logs)
-const { groupedLogs } = useGroupedLogs(filteredLogs)
+const { logs, status, clearLogs } = useLogs();
+const { filters, filteredLogs } = useLogFilters(logs);
+const { groupedLogs } = useGroupedLogs(filteredLogs);
 
-const selectedLog = ref<LogEntry | null>(null)
+const selectedLog = ref<LogEntry | null>(null);
+const selectedAxiosLog = ref<AxiosRequestMeta | null>(null);
 
 const columns = [
   { accessorKey: 'method', header: 'Method' },
   { accessorKey: 'url', header: 'URL' },
   { accessorKey: 'status', header: 'Status' },
   { accessorKey: 'duration', header: 'Time' },
-  { accessorKey: 'request.timestamp', header: 'Timestamp' }
-]
+  { accessorKey: 'request.timestamp', header: 'Timestamp' },
+];
 
 interface TableRow<T> {
-  original: T
-  getValue: (key: string) => any
+  original: T;
+  getValue: (key: string) => any;
 }
 
 function onRowClick(_: any, row: TableRow<GroupedRow>) {
-  selectedLog.value = row.original.kind === 'bff' ? row.original.log : row.original.parent
+  selectedLog.value = row.original.kind === 'bff' ? row.original.log : row.original.parent;
+  selectedAxiosLog.value = row.original?.axios;
 }
 </script>
