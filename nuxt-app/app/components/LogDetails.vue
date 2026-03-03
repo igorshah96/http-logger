@@ -54,15 +54,17 @@
           class="flex-1 overflow-hidden"
           :ui="{ content: 'p-4 overflow-auto h-full' }"
         >
-          <template #request-headers>
+          <template #headers>
+            <p>request-headers</p>
             <pre class="text-xs font-mono">{{ JSON.stringify(log.request?.headers, null, 2) }}</pre>
+            <br>
+            <p>response-headers</p>
+            <pre class="text-xs font-mono">{{ formatBody(log.response?.headers) }}</pre>
           </template>
           <template #request-body>
             <pre class="text-xs font-mono">{{ formatBody(log.request?.body) }}</pre>
           </template>
-          <template #response-headers>
-            <pre class="text-xs font-mono">{{ JSON.stringify(log.response?.headers, null, 2) }}</pre>
-          </template>
+
           <template #response-body>
             <pre class="text-xs font-mono">{{ formatBody(log.response?.body) }}</pre>
           </template>
@@ -96,10 +98,9 @@ const isOpen = computed({
 })
 
 const tabs = [
-  { label: 'Request Headers', slot: 'request-headers' },
-  { label: 'Request Body', slot: 'request-body' },
-  { label: 'Response Headers', slot: 'response-headers' },
-  { label: 'Response Body', slot: 'response-body' }
+  { label: 'Headers', slot: 'headers' },
+  { label: 'Body', slot: 'request-body' },
+  { label: 'Response', slot: 'response-body' }
 ]
 
 function formatBody(body: any) {
@@ -114,3 +115,9 @@ function formatBody(body: any) {
   return JSON.stringify(body, null, 2)
 }
 </script>
+
+<style>
+:root {
+  --container-md: 700px;
+}
+</style>

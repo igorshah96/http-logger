@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.1",
+    "@types/node": "^25.3.3",
     "eslint": "^10.0.0",
     "prettier": "3.8.1",
     "typescript": "^5.9.3",
