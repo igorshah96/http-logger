@@ -1,6 +1,6 @@
 import { defineWebSocketHandler } from 'h3';
 import { logStorage } from '../utils/storage';
-import { LogEntry, WsServerMessage } from '../../shared/types';
+import { LogEntry, WsClientMessage, WsServerMessage } from '../../shared/types';
 
 export default defineWebSocketHandler({
   open(peer) {
@@ -28,30 +28,41 @@ export default defineWebSocketHandler({
       peer.send(JSON.stringify(message));
     };
 
-    logStorage.on('logAdded', onLogAdded);
-    logStorage.on('logsCleared', onLogsCleared);
+    const unsubscribeLogAdded = logStorage.onLogAdded(onLogAdded);
+    const unsubscribeLogsCleared = logStorage.onLogsCleared(onLogsCleared);
 
     // Store handlers on peer context to remove later
     peer.ctx = peer.ctx || {};
-    peer.ctx.onLogAdded = onLogAdded;
-    peer.ctx.onLogsCleared = onLogsCleared;
+    peer.ctx.onLogAdded = unsubscribeLogAdded;
+    peer.ctx.onLogsCleared = unsubscribeLogsCleared;
   },
 
   close(peer) {
     console.log('[WS] Peer disconnected', peer.id);
     if (peer.ctx?.onLogAdded) {
-      logStorage.off('logAdded', peer.ctx.onLogAdded);
+      peer.ctx.onLogAdded();
     }
     if (peer.ctx?.onLogsCleared) {
-      logStorage.off('logsCleared', peer.ctx.onLogsCleared);
+      peer.ctx.onLogsCleared();
     }
   },
 
   message(peer, message) {
-    console.log('[WS] Message from peer', peer.id, message.text());
-    // Handle potential client messages if needed
-    if (message.text() === 'CLEAR_LOGS') {
-      logStorage.clearLogs();
+    const raw = message.text();
+    console.log('[WS] Message from peer', peer.id, raw);
+
+    try {
+      const parsed = JSON.parse(raw) as WsClientMessage;
+
+      switch (parsed.type) {
+        case 'CLEAR_LOGS':
+          logStorage.clearLogs();
+          break;
+        default:
+          console.warn('[WS] Unknown client message type', parsed);
+      }
+    } catch (error) {
+      console.error('[WS] Failed to parse client message', error);
     }
   },
 });

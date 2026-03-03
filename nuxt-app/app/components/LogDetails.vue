@@ -17,7 +17,7 @@
           <div class="flex items-center gap-4 text-xs text-muted">
             <span :class="getStatusColor(log.status)">Status: {{ log.status }}</span>
             <span>Duration: {{ log.duration }}ms</span>
-            <span v-if="log.request?.timestamp">{{ new Date(log.request.timestamp).toLocaleString() }}</span>
+            <span v-if="log.request?.timestamp">{{ formatDateTime(log.request.timestamp) }}</span>
           </div>
           <div v-if="log.userId || log.traceId || log.bffPath" class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground/60 font-mono">
             <span v-if="log.userId" title="User ID">UID: {{ log.userId }}</span>
@@ -52,6 +52,7 @@ import type { LogEntry } from '../../shared/types';
 import { UBadge, USlideover, UTabs } from '#components';
 
 import { getMethodColor, getStatusColor } from '../utils/colors';
+import { formatDateTime } from '../utils/format';
 
 const props = defineProps<{
   log: LogEntry | null;

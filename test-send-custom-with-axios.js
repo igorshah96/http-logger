@@ -85,7 +85,7 @@ async function sendLog() {
   );
 
   try {
-    const response = await fetch('http://localhost:4444', {
+    const response = await fetch('http://localhost:4443/api/logs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -2,6 +2,8 @@ import { ref } from 'vue';
 import { useWebSocket } from '@vueuse/core';
 import type { LogEntry, WsServerMessage, WsClientMessage } from '../../shared/types';
 
+import { applyLogsServerMessage } from '../utils/wsProtocol';
+
 export function useLogs() {
   const logs = ref<LogEntry[]>([]);
 
@@ -10,25 +12,17 @@ export function useLogs() {
     onMessage: (_, event) => {
       try {
         const message: WsServerMessage = JSON.parse(event.data);
-        if (message.type === 'INITIAL_STATE') {
-          logs.value = message.payload;
-        } else if (message.type === 'LOG_ADDED') {
-          logs.value.unshift(message.payload);
-          if (logs.value.length > 1000) {
-            logs.value.pop();
-          }
-        } else if (message.type === 'LOGS_CLEARED') {
-          logs.value = [];
-        }
+        applyLogsServerMessage(logs, message);
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Failed to parse WS message', e);
       }
     },
   });
 
   const clearLogs = () => {
-    const msg: WsClientMessage = 'CLEAR_LOGS';
-    send(msg);
+    const msg: WsClientMessage = { type: 'CLEAR_LOGS' };
+    send(JSON.stringify(msg));
   };
 
   return {
