@@ -28,6 +28,9 @@ export default defineNitroPlugin(() => {
         try {
           const rawPayload = JSON.parse(body);
           const payload = transformLog(rawPayload);
+          
+          console.log(`[HTTP Logger] Incoming request: ${payload.method} ${payload.url} (Source: ${payload.source})`);
+
           const logEntry: LogEntry = {
             ...payload,
             id: randomUUID(),
@@ -36,8 +39,10 @@ export default defineNitroPlugin(() => {
           res.statusCode = 201;
           res.end(JSON.stringify({ status: 'ok', id: logEntry.id }));
         } catch (error) {
-          res.statusCode = 400;
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`[HTTP Logger] Error processing request: ${errorMessage}`);
+          
+          res.statusCode = 400;
           res.end(JSON.stringify({ error: 'Invalid JSON', details: errorMessage }));
         }
       });
