@@ -10,12 +10,21 @@ export default defineNitroPlugin(() => {
   const server = http.createServer((req, res) => {
     // Enable CORS for external sources if needed
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
       res.statusCode = 204;
       res.end();
+      return;
+    }
+
+    if (req.method === 'GET') {
+      console.log('[HTTP Logger] Test GET / called');
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.end(JSON.stringify({ status: 'ok' }));
       return;
     }
 
