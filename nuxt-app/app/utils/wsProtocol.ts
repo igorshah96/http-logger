@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 
-import type { LogEntry, WsServerMessage } from '../../shared/types'
-import { LOGS_MAX_ITEMS } from '../../shared/config'
+import type { LogEntry, WsServerMessage } from '#shared/types'
+import { LOGS_MAX_ITEMS } from '#shared/config'
 
 export function applyLogsServerMessage(logs: Ref<LogEntry[]>, message: WsServerMessage) {
   if (message.type === 'INITIAL_STATE') {

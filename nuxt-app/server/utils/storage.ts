@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 
-import type { LogEntry } from '../../shared/types'
-import { LOGS_MAX_ITEMS } from '../../shared/config'
+import type { LogEntry } from '#shared/types'
+import { LOGS_MAX_ITEMS } from '#shared/config'
 
 type LogAddedListener = (log: LogEntry) => void
 type LogsClearedListener = () => void

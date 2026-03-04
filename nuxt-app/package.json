@@ -5,10 +5,11 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --port 4443 --host",
-    "preview": "nuxt preview",
+    "preview": "nuxt preview --port 4443",
+    "clear": "nuxi cleanup",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lintfix": "eslint . --fix",
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
