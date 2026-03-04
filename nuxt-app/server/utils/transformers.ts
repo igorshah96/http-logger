@@ -9,6 +9,8 @@ export type Transformer<TInput = unknown> = (payload: TInput) => ExternalLogPayl
 function isCustomLoggerInfo(payload: unknown): payload is CustomLoggerInfo {
   if (!payload || typeof payload !== 'object') return false
   const p = payload as Partial<CustomLoggerInfo>
+  // Если есть 'status' на верхнем уровне — это внешний формат, а не CustomLoggerInfo
+  if ('status' in p && typeof p.status === 'number') return false
   return typeof p.method === 'string'
     && typeof p.url === 'string'
     && typeof p.response === 'object'

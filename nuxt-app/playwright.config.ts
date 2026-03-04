@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './',
-  testMatch: 'test-details.spec.ts',
+  testMatch: '*.spec.ts',
   timeout: 60000,
   use: {
     baseURL: 'http://localhost:4443',
