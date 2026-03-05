@@ -7,6 +7,14 @@ import { applyLogsServerMessage } from '../utils/wsProtocol'
 export function useLogs() {
   const logs = ref<LogEntry[]>([])
 
+  if (import.meta.server || typeof window === 'undefined') {
+    return {
+      logs,
+      status: ref<'OPEN' | 'CLOSED' | 'CONNECTING'>('CLOSED'),
+      clearLogs: () => {}
+    }
+  }
+
   const { status, send } = useWebSocket('/_ws', {
     autoReconnect: true,
     onMessage: (_, event) => {

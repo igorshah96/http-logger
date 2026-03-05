@@ -136,12 +136,24 @@ const isOpen = computed({
   }
 })
 
-const tabs = [
-  { label: 'Headers', slot: 'headers' },
-  { label: 'Body', slot: 'request-body' },
-  { label: 'Response', slot: 'response-body' },
-  { label: 'Axios Response', slot: 'axios' }
-]
+const tabs = computed(() => {
+  const base = [
+    { label: 'Headers', slot: 'headers' },
+    { label: 'Body', slot: 'request-body' },
+    { label: 'Response', slot: 'response-body' }
+  ]
+  if (props.axiosLog) {
+    return [
+      { label: 'Axios Response', slot: 'axios' },
+      ...base
+    ]
+  }
+  return [
+    { label: 'Response', slot: 'response-body' },
+    { label: 'Headers', slot: 'headers' },
+    { label: 'Body', slot: 'request-body' }
+  ]
+})
 
 function formatBody(body: any) {
   if (!body) return null

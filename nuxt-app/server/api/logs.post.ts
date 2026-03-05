@@ -78,11 +78,10 @@ export default defineEventHandler(async (event) => {
     assertBodySize(stringified)
 
     const parsed = typeof rawBody === 'string' ? JSON.parse(rawBody) : (rawBody as ExternalLogPayload)
-    
-    // Validate required fields before transform
-    validatePayload(parsed)
-    
+
     const payload = transformLog(parsed)
+
+    validatePayload(payload)
 
     console.log(`[HTTP Logger] Incoming request: ${payload.method} ${payload.url} (Source: ${payload.source ?? 'unknown'})`)
 

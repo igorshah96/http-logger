@@ -115,7 +115,7 @@ async function sendLog() {
   } catch (error) {
     console.error(
       'Ошибка соединения с сервером (убедитесь, что http-logger запущен):',
-      error.meszsage,
+      error.message,
     );
   }
 }
