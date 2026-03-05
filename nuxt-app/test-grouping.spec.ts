@@ -13,7 +13,7 @@ test('Тестирование группировки BFF + axios запросы
   console.log('Шаг 2: Очищаем таблицу перед тестом')
   const clearButton = page.locator('button', { hasText: 'Clear Logs' })
   await clearButton.click()
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(1000)
 
   // 3. Отправляем BFF-запрос с вложенными axios-вызовами
   console.log('\nШаг 3: Отправляем BFF-запрос с вложенными axios-вызовами')
@@ -126,7 +126,7 @@ test('Тестирование группировки BFF + axios запросы
   })
   console.log('Обычный запрос без axios отправлен\n')
 
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(500)
 
   // 6. Проверяем количество строк в таблице
   console.log('Шаг 6: Проверяем количество строк в таблице')
@@ -220,7 +220,7 @@ test('Тестирование группировки BFF + axios запросы
   // 12. Кликаем на BFF-строку и проверяем детали
   console.log('\nШаг 12: Кликаем на BFF-строку и проверяем детали')
   await bff1Row.click()
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(500)
 
   // Проверяем, что панель открылась
   const panelHeader = page.locator('text=Request Details').first()
@@ -236,12 +236,12 @@ test('Тестирование группировки BFF + axios запросы
   } else {
     await page.mouse.click(50, 100)
   }
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(500)
 
   // Кликаем на axios-строку с force=true
   const firstAxiosRow = axiosRows.first()
   await firstAxiosRow.click({ force: true })
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(1000)
 
   // Проверяем, что видна вкладка "Axios Response"
   // UTabs использует [data-slot="trigger"] для кнопок вкладок
@@ -254,7 +254,7 @@ test('Тестирование группировки BFF + axios запросы
   if (hasAxiosTab) {
     // Пробуем кликнуть на вкладку
     await axiosTab.click()
-    await page.waitForTimeout(1500)
+    await page.waitForTimeout(1000)
 
     // Проверяем, что вкладка активна
     const tabList = page.locator('[role="tablist"]')
@@ -304,7 +304,7 @@ test('Тестирование группировки BFF + axios запросы
   } else {
     await page.mouse.click(50, 100)
   }
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   console.log('\n=== ИТОГИ ТЕСТА ===')
   console.log(`✓ Общее количество строк: ${totalRows} (ожидалось 6)`)

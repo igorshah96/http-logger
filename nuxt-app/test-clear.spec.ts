@@ -7,13 +7,13 @@ test('Тестирование очистки логов', async ({ page }) => {
   console.log('Шаг 1: Открываем страницу http://localhost:4443')
   await page.goto('http://localhost:4443')
   await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000)
+  await page.waitForTimeout(500)
 
   // 2. Очищаем таблицу перед тестом
   console.log('Шаг 2: Очищаем таблицу перед тестом')
   const clearButton = page.locator('button', { hasText: 'Clear Logs' })
   await clearButton.click()
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(500)
 
   // Проверяем, что таблица пуста
   let tableRows = page.locator('tbody tr')
@@ -61,7 +61,7 @@ test('Тестирование очистки логов', async ({ page }) => {
   console.log('3 тестовых лога отправлены\n')
 
   // Ждём появления логов в таблице
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(500)
 
   // 4. Проверяем, что логи появились
   console.log('Шаг 4: Проверяем, что логи появились в таблице')
@@ -91,7 +91,7 @@ test('Тестирование очистки логов', async ({ page }) => {
   // 6. Нажимаем кнопку "Clear Logs"
   console.log('\nШаг 6: Нажимаем кнопку "Clear Logs"')
   await clearButton.click()
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(500)
 
   // 7. Проверяем, что таблица очистилась
   console.log('Шаг 7: Проверяем, что таблица очистилась')

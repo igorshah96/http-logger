@@ -13,7 +13,7 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log('Шаг 2: Очищаем таблицу перед тестом')
   const clearButton = page.locator('button', { hasText: 'Clear Logs' })
   await clearButton.click()
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(1000)
 
   // 3. Отправляем тестовые логи с разными методами и статусами
   console.log('\nШаг 3: Отправляем тестовые логи с разными методами и статусами')
@@ -42,7 +42,7 @@ test('Тестирование фильтрации логов', async ({ page }
   }
   console.log(`Отправлено ${testLogs.length} тестовых логов\n`)
 
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(500)
 
   // 4. Проверяем начальное количество строк
   console.log('Шаг 4: Проверяем начальное количество строк')
@@ -55,7 +55,7 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log('\nШаг 5: Тестируем поиск по URL (search: "/users")')
   const searchInput = page.locator('input[placeholder="Search URL..."]')
   await searchInput.fill('/users')
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   tableRows = page.locator('tbody tr')
   const searchCount = await tableRows.count()
@@ -72,7 +72,7 @@ test('Тестирование фильтрации логов', async ({ page }
   // 6. Сбрасываем поиск
   console.log('\nШаг 6: Сбрасываем поиск')
   await searchInput.clear()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   tableRows = page.locator('tbody tr')
   const afterSearchReset = await tableRows.count()
@@ -83,16 +83,16 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log('\nШаг 7: Тестируем фильтр по методам (GET)')
   const methodsButton = page.locator('button').filter({ hasText: /All Methods|Methods \(\d+\)/ }).first()
   await methodsButton.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   // Ищем опцию GET в открывшемся меню
   const getOption = page.locator('[role="menuitem"], [role="option"]').filter({ hasText: 'GET' }).first()
   await getOption.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   // Закрываем dropdown кликом вне
   await page.keyboard.press('Escape')
-  await page.waitForTimeout(300)
+  await page.waitForTimeout(200)
 
   tableRows = page.locator('tbody tr')
   const getCount = await tableRows.count()
@@ -105,15 +105,15 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log('\nШаг 8: Добавляем фильтр по статусам (2xx)')
   const statusesDropdown = page.locator('button', { hasText: /All Statuses|Statuses \(\d+\)/ }).first()
   await statusesDropdown.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   // Ищем опцию 2xx в открывшемся меню
   const status2xxOption = page.locator('[role="menuitem"], [role="option"]').filter({ hasText: '2xx' }).first()
   await status2xxOption.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   await page.keyboard.press('Escape')
-  await page.waitForTimeout(300)
+  await page.waitForTimeout(200)
 
   tableRows = page.locator('tbody tr')
   const status2xxCount = await tableRows.count()
@@ -124,7 +124,7 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log('\nШаг 9: Тестируем кнопку Reset Filters')
   const resetButton = page.locator('button', { hasText: 'Reset Filters' })
   await resetButton.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   tableRows = page.locator('tbody tr')
   const afterReset = await tableRows.count()
@@ -143,14 +143,14 @@ test('Тестирование фильтрации логов', async ({ page }
   // 11. Тест фильтра по статусам (5xx)
   console.log('\nШаг 11: Тестируем фильтр по статусам (5xx)')
   await statusesDropdown.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   const status5xxOption = page.locator('[role="menuitem"], [role="option"]').filter({ hasText: '5xx' }).first()
   await status5xxOption.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   await page.keyboard.press('Escape')
-  await page.waitForTimeout(300)
+  await page.waitForTimeout(200)
 
   tableRows = page.locator('tbody tr')
   const status5xxCount = await tableRows.count()

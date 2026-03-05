@@ -9,13 +9,13 @@ test('Проверка деталей запроса /test-explicit', async ({ p
 
   // Ждём загрузки страницы и подключения WebSocket
   await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(500);
 
   // 1.5 Очищаем таблицу перед тестом
   console.log('Шаг 1.5: Очищаем таблицу перед тестом');
   const clearButton = page.locator('button', { hasText: 'Clear Logs' });
   await clearButton.click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 
   // 2. Отправляем тестовый лог на сервер (после открытия страницы для real-time обновления)
   console.log('Шаг 2: Отправляем тестовый лог POST /logs');
@@ -46,7 +46,7 @@ test('Проверка деталей запроса /test-explicit', async ({ p
   console.log('Тестовый лог отправлен\n');
 
   // Ждём появления лога в таблице
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 
   // 3. Проверяем статус WebSocket
   console.log('Шаг 3: Проверяем статус WebSocket');
@@ -76,7 +76,7 @@ test('Проверка деталей запроса /test-explicit', async ({ p
   // 5. Кликаем на найденную строку
   console.log('Шаг 5: Кликаем на строку с "/test-explicit"');
   await targetRow.first().click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 
   // 6. Делаем скриншот открытой панели
   console.log('Шаг 6: Делаем скриншот открытой панели с деталями');

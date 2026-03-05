@@ -9,7 +9,7 @@ test('Тестирование детализации запроса', async ({ 
 
   // Ждём загрузки страницы и подключения WebSocket
   await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(3000)
+  await page.waitForTimeout(1000)
 
   // 2. Проверяем статус WebSocket (ищем badge рядом с заголовком)
   console.log('Шаг 2: Проверяем статус WebSocket')
@@ -36,7 +36,7 @@ test('Тестирование детализации запроса', async ({ 
         response: { headers: {}, body: { data: 'test' }, timestamp: Date.now() + 50 }
       }
     })
-    await page.waitForTimeout(1500)
+    await page.waitForTimeout(500)
     tableRows = page.locator('tbody tr')
     rowCount = await tableRows.count()
     console.log(`Количество строк после добавления: ${rowCount}`)
@@ -48,7 +48,7 @@ test('Тестирование детализации запроса', async ({ 
   console.log('\nШаг 4: Кликаем на первую строку таблицы')
   const firstRow = page.locator('tbody tr').first()
   await firstRow.click()
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(500)
 
   // 5. Делаем скриншот открытой панели
   console.log('Шаг 5: Делаем скриншот открытой панели с деталями')
@@ -105,7 +105,7 @@ test('Тестирование детализации запроса', async ({ 
   console.log('\nШаг 8: Проверяем вкладку Headers')
   if (hasHeadersTab) {
     await headersTab.click()
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(300)
 
     // Ищем текст headers в JSON формате
     const jsonContent = page.locator('pre').first()
@@ -117,14 +117,14 @@ test('Тестирование детализации запроса', async ({ 
   console.log('\nШаг 9: Проверяем вкладку Body')
   if (hasBodyTab) {
     await bodyTab.click()
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(300)
   }
 
   // 10. Кликаем на вкладку Response и проверяем
   console.log('\nШаг 10: Проверяем вкладку Response')
   if (hasResponseTab) {
     await responseTab.click()
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(300)
   }
 
   // 11. Закрываем панель
@@ -140,7 +140,7 @@ test('Тестирование детализации запроса', async ({ 
     await page.mouse.click(50, 100)
     console.log('Клик вне панели')
   }
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(500)
 
   // 12. Проверяем, что панель закрылась
   console.log('Шаг 12: Проверяем, что панель закрылась')
