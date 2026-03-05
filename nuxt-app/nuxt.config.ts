@@ -2,6 +2,10 @@
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt'],
 
+  build: {
+    transpile: ['vue']
+  },
+
   imports: {
     // autoImport: false,
   },
@@ -13,7 +17,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   routeRules: {
-    '/': { ssr: false }
+    '/': { ssr: true }
   },
 
   compatibilityDate: '2025-01-15',
