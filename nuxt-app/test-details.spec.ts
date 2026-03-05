@@ -9,7 +9,7 @@ test('Тестирование детализации запроса', async ({ 
 
   // Ждём загрузки страницы и подключения WebSocket
   await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000)
+  await page.waitForTimeout(3000)
 
   // 2. Проверяем статус WebSocket (ищем badge рядом с заголовком)
   console.log('Шаг 2: Проверяем статус WebSocket')
@@ -19,9 +19,28 @@ test('Тестирование детализации запроса', async ({ 
 
   // 3. Проверяем наличие данных в таблице
   console.log('Шаг 3: Проверяем наличие данных в таблице')
-  const tableRows = page.locator('tbody tr')
-  const rowCount = await tableRows.count()
+  let tableRows = page.locator('tbody tr')
+  let rowCount = await tableRows.count()
   console.log(`Количество строк в таблице: ${rowCount}`)
+
+  // Если таблица пуста, отправляем тестовый лог
+  if (rowCount === 0 || (rowCount === 1 && await page.locator('text=No data').count() > 0)) {
+    console.log('Таблица пуста, отправляем тестовый лог')
+    await page.request.post('http://localhost:4443/api/logs', {
+      data: {
+        method: 'GET',
+        url: '/test-details',
+        status: 200,
+        duration: 50,
+        request: { headers: {}, query: {}, body: null, timestamp: Date.now() },
+        response: { headers: {}, body: { data: 'test' }, timestamp: Date.now() + 50 }
+      }
+    })
+    await page.waitForTimeout(1500)
+    tableRows = page.locator('tbody tr')
+    rowCount = await tableRows.count()
+    console.log(`Количество строк после добавления: ${rowCount}`)
+  }
 
   expect(rowCount).toBeGreaterThan(0)
 
@@ -44,7 +63,7 @@ test('Тестирование детализации запроса', async ({ 
   console.log(`Заголовок "Request Details" найден: ${hasPanelHeader}`)
 
   // Проверяем, что виден метод (badge с GET/POST/PUT/DELETE)
-  const methodBadge = page.locator('text=GET, text=POST, text=PUT, text=DELETE').first()
+  const methodBadge = page.locator('[class*="uppercase"]').filter({ hasText: /^(GET|POST|PUT|PATCH|DELETE)$/ }).first()
   const hasMethod = (await methodBadge.count()) > 0
   console.log(`Метод (badge) виден: ${hasMethod}`)
 

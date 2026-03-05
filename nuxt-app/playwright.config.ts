@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './',
   testMatch: '*.spec.ts',
   timeout: 60000,
+  workers: 1, // Последовательный запуск для изоляции тестов
   use: {
     baseURL: 'http://localhost:4443',
     viewport: { width: 1920, height: 1080 },

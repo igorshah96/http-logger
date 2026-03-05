@@ -7,10 +7,51 @@ import type { ExternalLogPayload, LogEntry } from '../../shared/types'
 
 const MAX_BODY_BYTES = 1024 * 1024 // 1MB hard limit for safety
 
+const REQUIRED_FIELDS = ['method', 'url', 'status', 'duration', 'request', 'response'] as const
+
 function assertBodySize(raw: string) {
   if (Buffer.byteLength(raw, 'utf8') > MAX_BODY_BYTES) {
     const error = new Error('Payload too large');
     (error as any).statusCode = 413
+    throw error
+  }
+}
+
+function validatePayload(payload: any): asserts payload is ExternalLogPayload {
+  const missingFields = REQUIRED_FIELDS.filter(field => !(field in payload))
+  if (missingFields.length > 0) {
+    const error = new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    (error as any).statusCode = 400
+    throw error
+  }
+  
+  // Validate nested request fields
+  if (!payload.request || typeof payload.request !== 'object') {
+    const error = new Error('Invalid request field: must be an object');
+    (error as any).statusCode = 400
+    throw error
+  }
+  
+  if (!payload.response || typeof payload.response !== 'object') {
+    const error = new Error('Invalid response field: must be an object');
+    (error as any).statusCode = 400
+    throw error
+  }
+  
+  // Validate required nested fields
+  const requiredRequestFields = ['headers', 'query', 'body', 'timestamp'] as const
+  const missingRequestFields = requiredRequestFields.filter(field => !(field in payload.request))
+  if (missingRequestFields.length > 0) {
+    const error = new Error(`Missing required request fields: ${missingRequestFields.join(', ')}`);
+    (error as any).statusCode = 400
+    throw error
+  }
+  
+  const requiredResponseFields = ['headers', 'body', 'timestamp'] as const
+  const missingResponseFields = requiredResponseFields.filter(field => !(field in payload.response))
+  if (missingResponseFields.length > 0) {
+    const error = new Error(`Missing required response fields: ${missingResponseFields.join(', ')}`);
+    (error as any).statusCode = 400
     throw error
   }
 }
@@ -37,6 +78,10 @@ export default defineEventHandler(async (event) => {
     assertBodySize(stringified)
 
     const parsed = typeof rawBody === 'string' ? JSON.parse(rawBody) : (rawBody as ExternalLogPayload)
+    
+    // Validate required fields before transform
+    validatePayload(parsed)
+    
     const payload = transformLog(parsed)
 
     console.log(`[HTTP Logger] Incoming request: ${payload.method} ${payload.url} (Source: ${payload.source ?? 'unknown'})`)

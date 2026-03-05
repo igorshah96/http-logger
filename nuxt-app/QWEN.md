@@ -7,7 +7,7 @@
 **Назначение:** Сервер принимает HTTP-логи (Request/Response) и хранит их в памяти. Клиент отображает список запросов через WebSocket, позволяет просматривать детали (Headers, Body, Params) и фильтровать логи.
 
 **Архитектура:**
-- **Сервер (Nitro):** Принимает POST-запросы на `/logs`, хранит данные в in-memory хранилище, рассылает обновления через WebSocket (`/_ws`)
+- **Сервер (Nitro):** Принимает POST-запросы на `/api/logs`, хранит данные в in-memory хранилище, рассылает обновления через WebSocket (`/_ws`)
 - **Клиент (Nuxt UI v4):** Отображает таблицу логов, детали запроса в боковой панели (USlideover), фильтрацию по URL/методам/status-кодам
 - **Группировка:** BFF-запросы отображаются как родительские строки, axios-вызовы — как вложенные (indented под родительским BFF)
 
@@ -45,8 +45,8 @@ nuxt-app/
 │   └── app.vue               # Корневой компонент (<UApp>)
 ├── server/                   # Серверная часть (Nitro)
 │   ├── api/
-│   │   ├── logs.get.ts       # Health-check эндпоинт
-│   │   ├── logs.post.ts      # Приём логов (POST /logs)
+│   │   ├── logs.get.ts       # Health-check эндпоинт (GET /api/logs)
+│   │   ├── logs.post.ts      # Приём логов (POST /api/logs)
 │   │   └── logs.options.ts   # CORS preflight
 │   ├── plugins/
 │   │   └── receiver.ts       # Пустой плагин (исторически)
@@ -139,7 +139,7 @@ npm typecheck
 
 ## API
 
-### POST /logs
+### POST /api/logs
 Приём лога. Тело запроса — `ExternalLogPayload`.
 
 **Заголовки:**
@@ -153,7 +153,7 @@ npm typecheck
 
 **Пример запроса (curl):**
 ```bash
-curl -X POST http://localhost:4443/logs \
+curl -X POST http://localhost:4443/api/logs \
   -H "Content-Type: application/json" \
   -H "X-HTTP-LOGGER-TOKEN: your-token" \
   -d '{
@@ -175,7 +175,7 @@ curl -X POST http://localhost:4443/logs \
   }'
 ```
 
-### GET /logs
+### GET /api/logs
 Health-check. Возвращает `{ status: 'ok' }`.
 
 ### WebSocket /_ws
@@ -220,7 +220,7 @@ import type { LogEntry } from '../../shared/types'
 | `shared/types.ts` | Контракты данных (LogEntry, WsServerMessage, WsClientMessage) |
 | `server/utils/storage.ts` | In-memory хранилище с EventEmitter (addLog, getLogs, clearLogs) |
 | `server/utils/transformers.ts` | Нормализация разных форматов логов в ExternalLogPayload |
-| `server/api/logs.post.ts` | Обработчик POST /logs (валидация, трансформация, сохранение) |
+| `server/api/logs.post.ts` | Обработчик POST /api/logs (валидация, трансформация, сохранение) |
 | `server/routes/_ws.ts` | WebSocket handler (рассылка INITIAL_STATE, LOG_ADDED, LOGS_CLEARED) |
 | `app/composables/useLogs.ts` | Клиентское WS-подключение через useWebSocket |
 | `app/composables/useGroupedLogs.ts` | Группировка: BFF-запрос + вложенные axios-вызовы в плоский список строк |

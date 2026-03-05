@@ -11,6 +11,12 @@ test('Проверка деталей запроса /test-explicit', async ({ p
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
 
+  // 1.5 Очищаем таблицу перед тестом
+  console.log('Шаг 1.5: Очищаем таблицу перед тестом');
+  const clearButton = page.locator('button', { hasText: 'Clear Logs' });
+  await clearButton.click();
+  await page.waitForTimeout(1000);
+
   // 2. Отправляем тестовый лог на сервер (после открытия страницы для real-time обновления)
   console.log('Шаг 2: Отправляем тестовый лог POST /logs');
   const testLog = {

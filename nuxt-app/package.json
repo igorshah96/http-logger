@@ -10,7 +10,10 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.90",
