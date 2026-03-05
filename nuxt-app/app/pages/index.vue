@@ -26,6 +26,17 @@
         >
           In-memory dev logger (no persistence)
         </span>
+        <UDropdownMenu
+          :items="columnOptions"
+          :content="{ align: 'end' }"
+        >
+          <UButton
+            icon="i-lucide-columns-3"
+            color="neutral"
+            variant="outline"
+            size="sm"
+          />
+        </UDropdownMenu>
       </div>
     </div>
 
@@ -36,8 +47,10 @@
 
     <div class="flex-1 overflow-auto border border-muted rounded-lg">
       <UTable
+        v-model:column-visibility="columnVisibility"
         :data="groupedLogs"
         :columns="columns"
+        resizable
         :ui="{ tr: 'cursor-pointer hover:bg-elevated/50' }"
         class="w-full"
         :on-select="onRowClick"
@@ -47,18 +60,30 @@
             <UBadge
               :color="getMethodColor(row.original.log.method)"
               variant="subtle"
-              class="uppercase"
+              class="uppercase w-16 justify-center"
             >
               {{ row.original.log.method }}
             </UBadge>
           </template>
           <template v-else>
-            <div class="flex items-center gap-1 pl-4 text-[10px] text-muted">
+            <div class="flex items-center gap-1 pl-4">
               <UIcon
                 name="i-lucide-corner-down-right"
-                class="size-3"
+                class="size-3 text-muted"
               />
-              <span class="font-mono uppercase">axios</span>
+              <UBadge
+                v-if="row.original.axios.method"
+                :color="getMethodColor(row.original.axios.method)"
+                variant="subtle"
+                size="sm"
+                class="uppercase text-[10px] w-14 justify-center py-0"
+              >
+                {{ row.original.axios.method }}
+              </UBadge>
+              <span
+                v-else
+                class="font-mono uppercase text-[10px] text-muted"
+              >axios</span>
             </div>
           </template>
         </template>
@@ -85,7 +110,7 @@
         <template #url-cell="{ row }">
           <template v-if="row.original.kind === 'bff'">
             <span
-              class="truncate max-w-md block font-mono text-xs"
+              class="truncate block font-mono text-xs"
               :title="row.original.log.url"
             >
               {{ row.original.log.url }}
@@ -93,7 +118,7 @@
           </template>
           <template v-else>
             <span
-              class="truncate max-w-md block font-mono text-xs pl-8 border-l border-muted/40"
+              class="truncate block font-mono text-xs pl-8 border-l border-muted/40"
               :title="row.original.axios.url"
             >
               {{ row.original.axios.url }}
@@ -125,7 +150,7 @@
       </UTable>
     </div>
 
-    <LogDetails v-model:log="selectedLog" :axios-log="selectedAxiosLog"/>
+    <LogDetails v-model:log="selectedLog" :axios-log="(selectedAxiosLog as AxiosRequestMeta | null)"/>
   </div>
 </template>
 
@@ -147,8 +172,13 @@ const { logs, status, clearLogs } = useLogs();
 const { filters, filteredLogs } = useLogFilters(logs);
 const { groupedLogs } = useGroupedLogs(filteredLogs);
 
-const selectedLog = ref<LogEntry | null>(null);
-const selectedAxiosLog = ref<AxiosRequestMeta | null>(null);
+const columnVisibility = ref<Record<string, boolean>>({
+  method: true,
+  url: true,
+  status: true,
+  duration: true,
+  'request.timestamp': true
+});
 
 const columns = [
   { accessorKey: 'method', header: 'Method' },
@@ -158,6 +188,20 @@ const columns = [
   { accessorKey: 'request.timestamp', header: 'Timestamp' },
 ];
 
+const columnOptions = computed(() => [
+  columns.map(col => ({
+    label: col.header,
+    type: 'checkbox' as const,
+    checked: columnVisibility.value[col.accessorKey] ?? true,
+    onUpdateChecked: (checked: boolean) => {
+      columnVisibility.value[col.accessorKey] = checked;
+    }
+  }))
+]);
+
+const selectedLog = ref<LogEntry | null>(null);
+const selectedAxiosLog = ref<AxiosRequestMeta | null>(null);
+
 interface TableRow<T> {
   original: T;
   getValue: (key: string) => any;
@@ -165,6 +209,6 @@ interface TableRow<T> {
 
 function onRowClick(_: any, row: TableRow<GroupedRow>) {
   selectedLog.value = row.original.kind === 'bff' ? row.original.log : row.original.parent;
-  selectedAxiosLog.value = row.original?.axios;
+  selectedAxiosLog.value = row.original.kind === 'axios' ? row.original.axios : null;
 }
 </script>

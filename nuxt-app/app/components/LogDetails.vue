@@ -46,54 +46,88 @@
               v-if="log.source"
               title="Source"
             >SRC: {{ log.source }}</span>
-          </div>
         </div>
+      </div>
 
-        <UTabs
-          :items="tabs"
-          class="flex-1 overflow-hidden"
-          :ui="{ content: 'p-4 overflow-auto h-full' }"
-        >
-          <template #headers>
-            <p>request-headers</p>
-            <pre class="text-xs font-mono">{{ JSON.stringify(log.request?.headers, null, 2) }}</pre>
-            <br>
-            <p>response-headers</p>
-            <pre class="text-xs font-mono">{{ formatBody(log.response?.headers) }}</pre>
-          </template>
-          <template #request-body>
-            <pre class="text-xs font-mono">{{ formatBody(log.request?.body) }}</pre>
-          </template>
+      <div class="px-4 py-2 border-b border-muted bg-elevated/20">
+        <UInput
+          v-model="detailsSearch"
+          icon="i-lucide-search"
+          placeholder="Search in JSON..."
+          size="sm"
+          class="w-full"
+        />
+      </div>
 
-          <template #response-body>
-            <pre class="text-xs font-mono">{{ formatBody(log.response?.body) }}</pre>
-          </template>
+      <UTabs
+        :items="tabs"
+        class="flex-1 overflow-hidden"
+        :ui="{ content: 'p-4 overflow-auto h-full' }"
+      >
+        <template #headers>
+          <div class="space-y-4">
+            <div>
+              <p class="text-[10px] font-bold text-muted uppercase mb-1">Request Headers</p>
+              <JsonViewer
+                :value="log.request?.headers"
+                :search="detailsSearch"
+              />
+            </div>
+            <USeparator />
+            <div>
+              <p class="text-[10px] font-bold text-muted uppercase mb-1">Response Headers</p>
+              <JsonViewer
+                :value="formatBody(log.response?.headers)"
+                :search="detailsSearch"
+              />
+            </div>
+          </div>
+        </template>
+        <template #request-body>
+          <JsonViewer
+            :value="formatBody(log.request?.body)"
+            :search="detailsSearch"
+          />
+        </template>
 
-          <template #axios v-if="axiosLog">
-            <pre class="text-xs font-mono">{{ formatBody(axiosLog) }}</pre>
-          </template>
-        </UTabs>
+        <template #response-body>
+          <JsonViewer
+            :value="formatBody(log.response?.body)"
+            :search="detailsSearch"
+          />
+        </template>
+
+        <template #axios v-if="axiosLog">
+          <JsonViewer
+            :value="formatBody(axiosLog)"
+            :search="detailsSearch"
+          />
+        </template>
+      </UTabs>
       </div>
     </template>
   </USlideover>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { AxiosRequestMeta, LogEntry } from '../../shared/types'
-import { UBadge, USlideover, UTabs } from '#components'
+import { UBadge, USlideover, UTabs, UInput, USeparator } from '#components'
+import JsonViewer from './JsonViewer.vue'
 
 import { getMethodColor, getStatusColor } from '../utils/colors'
 import { formatDateTime } from '../utils/format'
 
 const props = defineProps<{
   log: LogEntry | null
-  axiosLog: AxiosRequestMeta
+  axiosLog: AxiosRequestMeta | null | undefined
 }>()
 
 const emit = defineEmits<{
   'update:log': [value: LogEntry | null]
 }>()
+
+const detailsSearch = ref('')
 
 const isOpen = computed({
   get: () => !!props.log,
@@ -110,15 +144,15 @@ const tabs = [
 ]
 
 function formatBody(body: any) {
-  if (!body) return 'Empty'
+  if (!body) return null
   if (typeof body === 'string') {
     try {
-      return JSON.stringify(JSON.parse(body), null, 2)
+      return JSON.parse(body)
     } catch {
       return body
     }
   }
-  return JSON.stringify(body, null, 2)
+  return body
 }
 </script>
 

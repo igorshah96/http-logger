@@ -44,6 +44,7 @@ type OutgoingData = string
 type AddAxiosLogOpts = { requestTimestamp: number, reqBody: AxiosRequestConfig['data'] }
 
 type AxiosLog = {
+  method?: string
   url: string
   params: string
   code: number
@@ -204,6 +205,7 @@ export class LoggerUtil {
 
   private static formatAxiosSuccessResponse(response: AxiosResponse, opts: AddAxiosLogOpts): AxiosLog {
     return {
+      method: response.config.method?.toUpperCase(),
       url: response?.config.url ?? response.request?.url,
       params: response?.config.params,
       code: response.status,
@@ -217,6 +219,7 @@ export class LoggerUtil {
     const data = typeof error.response?.data === 'object' ? error.response?.data : { data: error.response?.data }
 
     return {
+      method: error.config?.method?.toUpperCase(),
       url: error.response?.config?.url || error.config?.url || '-',
       params: error.request?.params,
       code: error.response?.status || Number(error.status),

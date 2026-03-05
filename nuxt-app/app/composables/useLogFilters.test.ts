@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { describe, it, expect } from 'vitest'
 
 import type { LogEntry } from '../../shared/types'
 import { useLogFilters } from './useLogFilters'
@@ -38,6 +39,38 @@ describe('useLogFilters', () => {
     filters.value.methods = ['POST']
     filters.value.statuses = ['5']
 
+    expect(filteredLogs.value).toHaveLength(1)
+    expect(filteredLogs.value[0].id).toBe('2')
+  })
+
+  it('excludes by regex', () => {
+    const logs = ref<LogEntry[]>([
+      createLog({ id: '1', url: '/users/123' }),
+      createLog({ id: '2', url: '/admin/settings' }),
+      createLog({ id: '3', url: '/api/v1/health' })
+    ])
+
+    const { filters, filteredLogs } = useLogFilters(logs)
+
+    filters.value.exclude = 'health|admin'
+
+    expect(filteredLogs.value).toHaveLength(1)
+    expect(filteredLogs.value[0].id).toBe('1')
+  })
+
+  it('searches globally in headers and body', () => {
+    const logs = ref<LogEntry[]>([
+      createLog({ id: '1', request: { headers: { 'x-trace': 'trace-123' }, query: {}, body: null, timestamp: 0 } }),
+      createLog({ id: '2', response: { headers: {}, body: { error: 'not found' }, timestamp: 0 } })
+    ])
+
+    const { filters, filteredLogs } = useLogFilters(logs)
+
+    filters.value.globalSearch = 'trace-123'
+    expect(filteredLogs.value).toHaveLength(1)
+    expect(filteredLogs.value[0].id).toBe('1')
+
+    filters.value.globalSearch = 'not found'
     expect(filteredLogs.value).toHaveLength(1)
     expect(filteredLogs.value[0].id).toBe('2')
   })

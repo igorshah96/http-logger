@@ -38,13 +38,15 @@ const FILTER_CONFIG = {
 function reset() {
   emit('update:modelValue', {
     search: '',
+    exclude: '',
+    globalSearch: '',
     methods: [],
     statuses: []
   })
 }
 
 const hasFilters = computed(() => {
-  return filters.value.search || filters.value.methods.length > 0 || filters.value.statuses.length > 0
+  return filters.value.search || filters.value.exclude || filters.value.globalSearch || filters.value.methods.length > 0 || filters.value.statuses.length > 0
 })
 
 // Хелперы для отображения выбранных значений
@@ -70,7 +72,21 @@ const statusesLabel = computed(() => {
         v-model="filters.search"
         icon="i-lucide-search"
         placeholder="Search URL..."
-        class="w-64"
+        class="w-48"
+        size="sm"
+      />
+      <UInput
+        v-model="filters.exclude"
+        icon="i-lucide-filter-x"
+        placeholder="Exclude URL (regex)..."
+        class="w-48"
+        size="sm"
+      />
+      <UInput
+        v-model="filters.globalSearch"
+        icon="i-lucide-globe"
+        placeholder="Global Search..."
+        class="w-48"
         size="sm"
       />
     </div>

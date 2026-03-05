@@ -1,4 +1,5 @@
 export interface AxiosRequestMeta {
+  method?: string
   url: string
   params: string
   code: number
@@ -66,6 +67,8 @@ export type WsClientMessage = { type: 'CLEAR_LOGS' }
 
 export interface LogFiltersState {
   search: string
+  exclude: string
+  globalSearch: string
   methods: string[]
   statuses: string[]
 }
