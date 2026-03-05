@@ -23,7 +23,6 @@
       <UButton
         variant="ghost"
         size="xs"
-        icon="i-lucide-copy"
         :aria-label="copied ? 'Скопировано' : 'Копировать'"
         @click="copyText"
       >
@@ -36,19 +35,21 @@
         <UButton
           variant="ghost"
           size="xs"
-          icon="i-lucide-maximize"
           aria-label="Открыть на весь экран"
           @click="fullscreenOpen = true"
-        />
+        >
+          <UIcon name="i-lucide-maximize" class="size-4" />
+        </UButton>
       </template>
       <template v-else>
         <UButton
           variant="ghost"
           size="xs"
-          icon="i-lucide-x"
           aria-label="Закрыть"
           @click="emit('close')"
-        />
+        >
+          <UIcon name="i-lucide-x" class="size-4" />
+        </UButton>
       </template>
     </div>
 
@@ -66,6 +67,7 @@
         ><span
           v-if="part.match"
           class="bg-warning/20 ring-1 ring-warning/50"
+          data-testid="search-highlight"
         >{{ part.text }}</span><template v-else>{{ part.text }}</template></template></pre>
         <span
           v-else

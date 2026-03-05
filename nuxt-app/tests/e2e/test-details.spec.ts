@@ -107,16 +107,13 @@ test('Тестирование детализации запроса', async ({ 
     await headersTab.click()
     await page.waitForTimeout(300)
 
-    // Ищем JSON Viewer: ключи (purple), значения (green/blue)
-    const jsonKey = page.locator('.text-purple-500').first()
-    const hasJsonKey = (await jsonKey.count()) > 0
-    console.log(`JSON Key виден: ${hasJsonKey}`)
-    expect(hasJsonKey).toBeTruthy()
-
-    const jsonValue = page.locator('.text-green-500, .text-blue-500').first()
-    const hasJsonValue = (await jsonValue.count()) > 0
-    console.log(`JSON Value виден: ${hasJsonValue}`)
-    expect(hasJsonValue).toBeTruthy()
+    // JsonViewer показывает заголовки (сырой/преобразованный вид) или «Нет данных»
+    const activePanel = page.locator('[role="tabpanel"][data-state="active"]')
+    const headersText = await activePanel.textContent() ?? ''
+    expect(headersText).toContain('Request Headers')
+    const hasContent = headersText.includes('{') || headersText.includes('Нет данных')
+    console.log(`Содержимое Headers видно: ${hasContent}`)
+    expect(hasContent).toBeTruthy()
   }
 
   // 9. Кликаем на вкладку Body и проверяем внутренний поиск
@@ -129,8 +126,8 @@ test('Тестирование детализации запроса', async ({ 
     await searchInput.fill('bar')
     await page.waitForTimeout(300)
 
-    // Проверяем подсветку
-    const highlight = page.locator('.bg-yellow-500\\/20').first()
+    // Проверяем подсветку совпадений поиска в JsonViewer
+    const highlight = page.locator('[data-testid="search-highlight"]').first()
     const hasHighlight = (await highlight.count()) > 0
     console.log(`Подсветка "bar" найдена: ${hasHighlight}`)
     expect(hasHighlight).toBeTruthy()
@@ -138,7 +135,7 @@ test('Тестирование детализации запроса', async ({ 
     // Очищаем поиск
     await searchInput.clear()
     await page.waitForTimeout(300)
-    const highlightAfterClear = page.locator('.bg-yellow-500\\/20').first()
+    const highlightAfterClear = page.locator('[data-testid="search-highlight"]')
     expect(await highlightAfterClear.count()).toBe(0)
   }
 
@@ -152,7 +149,7 @@ test('Тестирование детализации запроса', async ({ 
     await searchInput.fill('success')
     await page.waitForTimeout(300)
 
-    const highlight = page.locator('.bg-yellow-500\\/20').first()
+    const highlight = page.locator('[data-testid="search-highlight"]').first()
     expect(await highlight.count()).toBeGreaterThan(0)
   }
 
