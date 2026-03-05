@@ -9,9 +9,9 @@ export function getMethodColor(method: string | undefined) {
 }
 
 export function getStatusColor(status: number | undefined) {
-  if (status === undefined) return 'text-muted'
+  if (status === undefined) return 'text-muted-foreground'
   if (status >= 200 && status < 300) return 'text-success'
   if (status >= 400) return 'text-error'
   if (status >= 300) return 'text-warning'
-  return 'text-muted'
+  return 'text-muted-foreground'
 }

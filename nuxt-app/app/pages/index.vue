@@ -21,7 +21,7 @@
           @click="clearLogs"
         />
         <span
-          class="text-xs text-muted"
+          class="text-xs text-muted-foreground"
           title="Это dev-инструмент, данные не сохраняются между перезапусками."
         >
           In-memory dev logger (no persistence)
@@ -69,7 +69,7 @@
             <div class="flex items-center gap-1 pl-4">
               <UIcon
                 name="i-lucide-corner-down-right"
-                class="size-3 text-muted"
+                class="size-3 text-muted-foreground"
               />
               <UBadge
                 v-if="row.original.axios.method"
@@ -82,7 +82,7 @@
               </UBadge>
               <span
                 v-else
-                class="font-mono uppercase text-[10px] text-muted"
+                class="font-mono uppercase text-[10px] text-muted-foreground"
               >axios</span>
             </div>
           </template>
@@ -92,14 +92,14 @@
           <template v-if="row.original.kind === 'bff'">
             <span
               :class="getStatusColor(row.original.log.status)"
-              class="font-mono"
+              class="font-mono text-sm"
             >
               {{ row.original.log.status }}
             </span>
           </template>
           <template v-else>
             <span
-              class="font-mono text-xs"
+              class="font-mono text-sm"
               :class="getStatusColor(row.original.axios.code)"
             >
               {{ row.original.axios.code }}
@@ -110,7 +110,7 @@
         <template #url-cell="{ row }">
           <template v-if="row.original.kind === 'bff'">
             <span
-              class="truncate block font-mono text-xs"
+              class="truncate block font-mono text-sm"
               :title="row.original.log.url"
             >
               {{ row.original.log.url }}
@@ -118,7 +118,7 @@
           </template>
           <template v-else>
             <span
-              class="truncate block font-mono text-xs pl-8 border-l border-muted/40"
+              class="truncate block font-mono text-sm pl-8 border-l border-muted/40"
               :title="row.original.axios.url"
             >
               {{ row.original.axios.url }}
@@ -128,21 +128,21 @@
 
         <template #duration-cell="{ row }">
           <template v-if="row.original.kind === 'bff'">
-            <span class="text-xs text-muted">{{ row.original.log.duration }}ms</span>
+            <span class="text-sm text-muted-foreground">{{ row.original.log.duration }}ms</span>
           </template>
           <template v-else>
-            <span class="text-xs text-muted">-</span>
+            <span class="text-sm text-muted-foreground">-</span>
           </template>
         </template>
 
         <template #request-timestamp-cell="{ row }">
           <template v-if="row.original.kind === 'bff'">
-            <span class="text-xs text-muted">
+            <span class="text-sm text-muted-foreground">
               {{ formatTime(row.original.log.request?.timestamp) }}
             </span>
           </template>
           <template v-else>
-            <span class="text-xs text-muted">
+            <span class="text-sm text-muted-foreground">
               {{ formatTime(row.original.axios.timestamp) }}
             </span>
           </template>

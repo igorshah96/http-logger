@@ -21,14 +21,14 @@
             </UBadge>
             <span class="font-mono text-sm truncate">{{ log.url }}</span>
           </div>
-          <div class="flex items-center gap-4 text-xs text-muted">
-            <span :class="getStatusColor(log.status)">Status: {{ log.status }}</span>
+          <div class="flex items-center gap-4 text-sm text-muted-foreground">
+            <span :class="getStatusColor(log.status)" class="font-bold">Status: {{ log.status }}</span>
             <span>Duration: {{ log.duration }}ms</span>
             <span v-if="log.request?.timestamp">{{ formatDateTime(log.request.timestamp) }}</span>
           </div>
           <div
             v-if="log.userId || log.traceId || log.bffPath"
-            class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground/60 font-mono"
+            class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground font-mono"
           >
             <span
               v-if="log.userId"
@@ -67,7 +67,7 @@
         <template #headers>
           <div class="space-y-4">
             <div>
-              <p class="text-[10px] font-bold text-muted uppercase mb-1">Request Headers</p>
+              <p class="text-xs font-bold text-muted-foreground uppercase mb-1">Request Headers</p>
               <JsonViewer
                 :value="log.request?.headers"
                 :search="detailsSearch"
@@ -75,7 +75,7 @@
             </div>
             <USeparator />
             <div>
-              <p class="text-[10px] font-bold text-muted uppercase mb-1">Response Headers</p>
+              <p class="text-xs font-bold text-muted-foreground uppercase mb-1">Response Headers</p>
               <JsonViewer
                 :value="formatBody(log.response?.headers)"
                 :search="detailsSearch"
