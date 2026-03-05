@@ -32,8 +32,8 @@ test('Тестирование детализации запроса', async ({ 
         url: '/test-details',
         status: 200,
         duration: 50,
-        request: { headers: {}, query: {}, body: null, timestamp: Date.now() },
-        response: { headers: {}, body: { data: 'test' }, timestamp: Date.now() + 50 }
+        request: { headers: { 'Content-Type': 'application/json', 'X-Test': 'request-header' }, query: { search: 'query-param' }, body: { foo: 'bar', nested: { key: 'value' } }, timestamp: Date.now() },
+        response: { headers: { 'X-Response': 'response-header' }, body: { result: 'success', data: { items: [1, 2, 3], detail: 'some complex detail' } }, timestamp: Date.now() + 50 }
       }
     })
     await page.waitForTimeout(500)
@@ -68,7 +68,7 @@ test('Тестирование детализации запроса', async ({ 
   console.log(`Метод (badge) виден: ${hasMethod}`)
 
   // Проверяем URL
-  const urlText = page.locator('text=/\\/api\\//i').first()
+  const urlText = page.locator('text=/test-details/i').first()
   const hasUrl = (await urlText.count()) > 0
   console.log(`URL виден: ${hasUrl}`)
 
@@ -107,17 +107,39 @@ test('Тестирование детализации запроса', async ({ 
     await headersTab.click()
     await page.waitForTimeout(300)
 
-    // Ищем текст headers в JSON формате
-    const jsonContent = page.locator('pre').first()
-    const hasJson = (await jsonContent.count()) > 0
-    console.log(`JSON контент виден: ${hasJson}`)
+    // Ищем JSON Viewer: ключи (purple), значения (green/blue)
+    const jsonKey = page.locator('.text-purple-500').first()
+    const hasJsonKey = (await jsonKey.count()) > 0
+    console.log(`JSON Key виден: ${hasJsonKey}`)
+    expect(hasJsonKey).toBeTruthy()
+
+    const jsonValue = page.locator('.text-green-500, .text-blue-500').first()
+    const hasJsonValue = (await jsonValue.count()) > 0
+    console.log(`JSON Value виден: ${hasJsonValue}`)
+    expect(hasJsonValue).toBeTruthy()
   }
 
-  // 9. Кликаем на вкладку Body и проверяем
-  console.log('\nШаг 9: Проверяем вкладку Body')
+  // 9. Кликаем на вкладку Body и проверяем внутренний поиск
+  console.log('\nШаг 9: Проверяем вкладку Body и внутренний поиск')
   if (hasBodyTab) {
     await bodyTab.click()
     await page.waitForTimeout(300)
+
+    const searchInput = page.getByPlaceholder('Search in JSON...')
+    await searchInput.fill('bar')
+    await page.waitForTimeout(300)
+
+    // Проверяем подсветку
+    const highlight = page.locator('.bg-yellow-500\\/20').first()
+    const hasHighlight = (await highlight.count()) > 0
+    console.log(`Подсветка "bar" найдена: ${hasHighlight}`)
+    expect(hasHighlight).toBeTruthy()
+
+    // Очищаем поиск
+    await searchInput.clear()
+    await page.waitForTimeout(300)
+    const highlightAfterClear = page.locator('.bg-yellow-500\\/20').first()
+    expect(await highlightAfterClear.count()).toBe(0)
   }
 
   // 10. Кликаем на вкладку Response и проверяем
@@ -125,6 +147,13 @@ test('Тестирование детализации запроса', async ({ 
   if (hasResponseTab) {
     await responseTab.click()
     await page.waitForTimeout(300)
+
+    const searchInput = page.getByPlaceholder('Search in JSON...')
+    await searchInput.fill('success')
+    await page.waitForTimeout(300)
+
+    const highlight = page.locator('.bg-yellow-500\\/20').first()
+    expect(await highlight.count()).toBeGreaterThan(0)
   }
 
   // 11. Закрываем панель
@@ -161,6 +190,8 @@ test('Тестирование детализации запроса', async ({ 
   console.log(`✓ Duration виден: ${hasDuration}`)
   console.log(`✓ TraceId виден: ${hasTraceId}`)
   console.log(`✓ Вкладки: Headers=${hasHeadersTab}, Body=${hasBodyTab}, Response=${hasResponseTab}`)
+  console.log('✓ JSON Viewer работает (ключи/значения найдены)')
+  console.log('✓ Внутренний поиск в Body/Response работает (подсветка найдена)')
   console.log(`✓ Панель закрылась: ${isPanelClosed}`)
 
   console.log('\nСкриншоты сохранены:')

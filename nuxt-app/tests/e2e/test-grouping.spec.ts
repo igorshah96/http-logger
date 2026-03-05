@@ -262,34 +262,16 @@ test('Тестирование группировки BFF + axios запросы
     const activeTabText = await activeTab.textContent()
     console.log(`Активная вкладка: ${activeTabText?.trim()}`)
 
-    // Проверяем содержимое вкладки — ищем pre с JSON данными axios
-    // UTabs показывает только активную вкладку, поэтому ищем все pre
-    const allPre = page.locator('pre')
-    const preCount = await allPre.count()
-    console.log(`Количество pre элементов: ${preCount}`)
-
-    // Ищем pre, который содержит axios данные
-    let axiosText = ''
-    for (let i = 0; i < preCount; i++) {
-      const preText = await allPre.nth(i).textContent()
-      if (preText?.includes('internal-api')) {
-        axiosText = preText
-        console.log(`Найден pre с axios данными (индекс ${i})`)
-        break
-      }
-    }
-
-    if (!axiosText && preCount > 0) {
-      axiosText = await allPre.last().textContent()
-    }
-
+    // Проверяем содержимое вкладки — ищем данные в JsonViewer
+    // UTabs показывает только активную вкладку в [role="tabpanel"][data-state="active"]
+    const activePanel = page.locator('[role="tabpanel"][data-state="active"]')
+    const axiosText = await activePanel.textContent()
     console.log(`Содержимое axios: ${axiosText?.substring(0, 150)}...`)
 
     // Проверяем, что вкладка содержит данные axios (URL, code, timestamp)
     expect(axiosText).toBeTruthy()
-    expect(axiosText?.length).toBeGreaterThan(10)
-
-    // Проверяем наличие ключевых полей axios в JSON
+    // В JsonViewer ключи могут быть без кавычек в тексте или с ними, 
+    // но текст "url" точно должен быть
     expect(axiosText).toContain('url')
     expect(axiosText).toContain('code')
     expect(axiosText).toContain('internal-api')

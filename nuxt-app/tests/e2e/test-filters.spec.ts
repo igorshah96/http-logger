@@ -157,8 +157,49 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log(`Найдено запросов со статусом 5xx: ${status5xxCount}`)
   expect(status5xxCount).toBeGreaterThanOrEqual(1)
 
-  // 12. Проверяем содержимое
-  console.log('\nШаг 12: Проверяем содержимое filtered таблицы')
+  // 12. Тест Regex Exclusion
+  console.log('\nШаг 12: Тестируем Regex Exclusion')
+  const excludeInput = page.getByPlaceholder('Exclude URL (regex)...')
+  // Сбрасываем фильтры перед новым тестом
+  await resetButton.click()
+  await page.waitForTimeout(300)
+
+  await excludeInput.fill('/users')
+  await page.waitForTimeout(300)
+
+  tableRows = page.locator('tbody tr')
+  const afterExcludeCount = await tableRows.count()
+  console.log(`Количество строк после исключения "/users": ${afterExcludeCount}`)
+  // Должно быть меньше, так как мы исключили /users (их было несколько)
+  expect(afterExcludeCount).toBeLessThan(initialCount)
+
+  // Проверяем, что в оставшихся строках НЕТ "/users"
+  for (let i = 0; i < afterExcludeCount; i++) {
+    const rowText = await tableRows.nth(i).textContent()
+    expect(rowText).not.toContain('/users')
+  }
+
+  // 13. Тест Global Search
+  console.log('\nШаг 13: Тестируем Global Search')
+  await excludeInput.clear()
+  const globalSearchInput = page.getByPlaceholder('Global Search...')
+  // Ищем строку, которая есть в body одного из логов (например, "POST" - мы передавали {data: log.method})
+  await globalSearchInput.fill('POST')
+  await page.waitForTimeout(300)
+
+  tableRows = page.locator('tbody tr')
+  const globalSearchCount = await tableRows.count()
+  console.log(`Найдено строк по глобальному поиску "POST": ${globalSearchCount}`)
+  // У нас 2 POST запроса в testLogs
+  expect(globalSearchCount).toBe(2)
+
+  for (let i = 0; i < globalSearchCount; i++) {
+    const rowText = await tableRows.nth(i).textContent()
+    expect(rowText).toContain('POST')
+  }
+
+  // 14. Проверяем содержимое
+  console.log('\nШаг 14: Проверяем содержимое filtered таблицы')
   // После фильтра по 5xx должна быть хотя бы 1 строка или "No data" если фильтр слишком строгий
   const rowText = await tableRows.first().textContent()
   console.log(`Первая строка: ${rowText}`)
@@ -173,4 +214,6 @@ test('Тестирование фильтрации логов', async ({ page }
   console.log(`✓ Фильтр по статусам (2xx) работает: найдено ${status2xxCount} строк`)
   console.log(`✓ Сброс фильтров работает: восстановлено ${afterReset} строк`)
   console.log(`✓ Фильтр по статусам (5xx) работает: найдено ${status5xxCount} строк`)
+  console.log(`✓ Regex Exclusion работает: исключено "/users", осталось ${afterExcludeCount} строк`)
+  console.log(`✓ Global Search работает: найдено ${globalSearchCount} строк для "POST"`)
 })
