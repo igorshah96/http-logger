@@ -52,7 +52,7 @@ test('Тестирование детализации запроса', async ({ 
 
   // 5. Делаем скриншот открытой панели
   console.log('Шаг 5: Делаем скриншот открытой панели с деталями')
-  await page.screenshot({ path: 'screenshot-panel-open.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/screenshots/screenshot-panel-open.png', fullPage: true })
 
   // 6. Проверяем, что панель открыта
   console.log('Шаг 6: Проверяем, что панель открыта')
@@ -149,7 +149,7 @@ test('Тестирование детализации запроса', async ({ 
   console.log(`Панель закрыта: ${isPanelClosed}`)
 
   // Финальный скриншот
-  await page.screenshot({ path: 'screenshot-panel-closed.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/screenshots/screenshot-panel-closed.png', fullPage: true })
 
   console.log('\n=== ИТОГИ ТЕСТА ===')
   console.log(`✓ WebSocket статус: ${wsText?.trim() || 'N/A'}`)
@@ -164,8 +164,8 @@ test('Тестирование детализации запроса', async ({ 
   console.log(`✓ Панель закрылась: ${isPanelClosed}`)
 
   console.log('\nСкриншоты сохранены:')
-  console.log('  - screenshot-panel-open.png (открытая панель)')
-  console.log('  - screenshot-panel-closed.png (закрытая панель)')
+  console.log('  - test-results/screenshots/screenshot-panel-open.png (открытая панель)')
+  console.log('  - test-results/screenshots/screenshot-panel-closed.png (закрытая панель)')
 
   // Assertions
   expect(rowCount).toBeGreaterThan(0)

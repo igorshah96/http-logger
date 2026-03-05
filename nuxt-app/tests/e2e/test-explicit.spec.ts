@@ -80,8 +80,8 @@ test('Проверка деталей запроса /test-explicit', async ({ p
 
   // 6. Делаем скриншот открытой панели
   console.log('Шаг 6: Делаем скриншот открытой панели с деталями');
-  await page.screenshot({ path: 'screenshot-test-explicit.png', fullPage: true });
-  console.log('Скриншот сохранён: screenshot-test-explicit.png\n');
+  await page.screenshot({ path: 'test-results/screenshots/screenshot-test-explicit.png', fullPage: true });
+  console.log('Скриншот сохранён: test-results/screenshots/screenshot-test-explicit.png\n');
 
   // 7. Проверяем панель деталей
   console.log('Шаг 7: Проверяем содержимое панели деталей');
@@ -141,7 +141,7 @@ test('Проверка деталей запроса /test-explicit', async ({ p
     console.log('\n✓ Ошибок в консоли нет');
   }
 
-  console.log('\n📸 Скриншот сохранён: screenshot-test-explicit.png');
+  console.log('\n📸 Скриншот сохранён: test-results/screenshots/screenshot-test-explicit.png');
 
   // Assertions
   expect(hasStatus200, 'Status должен быть 200 (не 0)').toBeTruthy();

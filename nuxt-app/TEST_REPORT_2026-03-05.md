@@ -125,7 +125,7 @@ curl -X POST http://localhost:4443/api/logs \
 
 ---
 
-## 📁 Скриншоты
+## 📁 Скриншоты (находятся в `test-results/screenshots/`)
 - `screenshot-test-explicit.png` — открытая панель с деталями
 - `screenshot-panel-open.png` — детальное view
 - `screenshot-panel-closed.png` — закрытая панель
