@@ -73,13 +73,24 @@
 
 ## 🔧 Техническая информация
 
+### Структура тестов:
+```
+tests/e2e/
+├── test-clear.spec.ts          # Тест очистки логов
+├── test-details.spec.ts        # Тест детализации запроса
+├── test-explicit.spec.ts       # Тест проверки конкретного запроса
+├── test-filters.spec.ts        # Тест фильтрации
+├── test-grouping.spec.ts       # Тест группировки BFF + axios
+└── test-payload-limit.spec.ts  # Тест ограничения payload 1MB
+```
+
 ### Команды для запуска:
 ```bash
 # Запуск dev-сервера
 npm run dev
 
-# Запуск Playwright тестов
-npm run test:e2e
+# Запуск всех E2E тестов (~30 сек)
+npm test
 
 # Preview продакшен-сборки
 npm run preview --port 4443

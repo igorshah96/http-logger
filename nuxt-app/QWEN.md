@@ -208,7 +208,26 @@ import type { LogEntry } from '../../shared/types'
 ```
 
 ### Тестирование
-Тесты покрывают критичную логику:
+
+**E2E тесты (Playwright):**
+```
+tests/e2e/
+├── test-clear.spec.ts          # Очистка логов
+├── test-details.spec.ts        # Детализация запроса (панель, вкладки)
+├── test-explicit.spec.ts       # Проверка конкретного запроса
+├── test-filters.spec.ts        # Фильтрация (поиск, методы, статусы)
+├── test-grouping.spec.ts       # Группировка BFF + axios
+└── test-payload-limit.spec.ts  # Ограничение payload 1MB
+```
+
+**Команды:**
+```bash
+npm test              # Запуск всех тестов
+npm run test:ui       # UI режим для отладки
+npm run test:headed   # Запуск в браузере
+```
+
+**Unit тесты:**
 - `server/utils/storage.test.ts` — хранилище логов
 - `server/utils/transformers.test.ts` — трансформеры форматов
 - `app/composables/useLogFilters.test.ts` — фильтрация

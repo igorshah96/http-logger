@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './',
+  testDir: './tests/e2e',
   testMatch: '*.spec.ts',
   timeout: 60000,
   workers: 1, // Последовательный запуск для стабильности
