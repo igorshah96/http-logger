@@ -61,6 +61,7 @@
         :value="child.value"
         :level="level + 1"
         :default-expanded="defaultExpanded"
+        :default-depth="defaultDepth"
       />
     </div>
   </div>
@@ -78,9 +79,12 @@ const props = withDefaults(
     value: unknown
     label?: string
     level?: number
+    /** Если задан — все узлы раскрыты/свёрнуты; иначе используется defaultDepth */
     defaultExpanded?: boolean
+    /** Глубина раскрытия по умолчанию (уровни 0..defaultDepth-1 раскрыты). По умолчанию 2 */
+    defaultDepth?: number
   }>(),
-  { defaultExpanded: false }
+  { defaultDepth: 1 }
 )
 
 const indentPerLevel = 1
@@ -95,7 +99,11 @@ const isObject = computed(
     !Array.isArray(props.value)
 )
 const expandable = computed(() => isArray.value || isObject.value)
-const open = ref(props.defaultExpanded)
+const open = ref(
+  props.defaultExpanded !== undefined
+    ? props.defaultExpanded
+    : (props.level ?? 0) < (props.defaultDepth ?? 2)
+)
 
 const entries = computed(() => {
   if (Array.isArray(props.value)) {

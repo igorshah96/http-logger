@@ -38,7 +38,10 @@
           aria-label="Открыть на весь экран"
           @click="fullscreenOpen = true"
         >
-          <UIcon name="i-lucide-maximize" class="size-4" />
+          <UIcon
+            name="i-lucide-maximize"
+            class="size-4"
+          />
         </UButton>
       </template>
       <template v-else>
@@ -48,15 +51,16 @@
           aria-label="Закрыть"
           @click="emit('close')"
         >
-          <UIcon name="i-lucide-x" class="size-4" />
+          <UIcon
+            name="i-lucide-x"
+            class="size-4"
+          />
         </UButton>
       </template>
     </div>
 
     <!-- Content -->
-    <div
-      class="min-h-0 flex-1 overflow-auto rounded-lg border border-muted bg-elevated p-3"
-    >
+    <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-muted bg-elevated p-3">
       <template v-if="viewMode === 'raw'">
         <pre
           v-if="rawText"
@@ -72,11 +76,16 @@
         <span
           v-else
           class="text-muted"
-        >Нет данных</span>
+          >Нет данных</span
+        >
       </template>
       <template v-else>
         <template v-if="isTreeable">
-          <JsonTree :value="sortedValue" :default-expanded="defaultExpanded" />
+          <JsonTree
+            :value="sortedValue"
+            :default-expanded="defaultExpanded"
+            :default-depth="defaultDepth"
+          />
         </template>
         <template v-else>
           <pre class="whitespace-pre-wrap break-words text-default">{{ rawText || 'Нет данных' }}</pre>
@@ -99,6 +108,7 @@
           :search="search"
           :initial-view-mode="viewMode"
           :default-expanded="defaultExpanded"
+          :default-depth="defaultDepth"
           standalone
           @close="fullscreenOpen = false"
         />
@@ -108,121 +118,114 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
+import { computed, ref, watch } from 'vue';
+import { useClipboard } from '@vueuse/core';
 
 const props = withDefaults(
   defineProps<{
-    value: any
-    search?: string
-    standalone?: boolean
-    initialViewMode?: 'raw' | 'transformed'
-    /** По умолчанию false — все узлы дерева свёрнуты */
-    defaultExpanded?: boolean
+    value: any;
+    search?: string;
+    standalone?: boolean;
+    initialViewMode?: 'raw' | 'transformed';
+    /** Если задан — все узлы раскрыты/свёрнуты; иначе используется defaultDepth */
+    defaultExpanded?: boolean;
+    /** Глубина раскрытия по умолчанию (уровни 0..defaultDepth-1 раскрыты). По умолчанию 2 */
+    defaultDepth?: number;
   }>(),
-  { standalone: false, defaultExpanded: false }
-)
+  { standalone: false, defaultDepth: 2, defaultExpanded: true },
+);
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 
-const viewMode = ref<'raw' | 'transformed'>(
-  props.initialViewMode ?? 'raw'
-)
+const viewMode = ref<'raw' | 'transformed'>(props.initialViewMode ?? 'raw');
 
 watch(
   () => props.initialViewMode,
   (v) => {
-    if (v) viewMode.value = v
+    if (v) viewMode.value = v;
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
-const fullscreenOpen = ref(false)
+const fullscreenOpen = ref(false);
 
 const rawText = computed(() => {
-  const v = props.value
-  if (v === null || v === undefined) return ''
+  const v = props.value;
+  if (v === null || v === undefined) return '';
   if (typeof v === 'object') {
     try {
-      return JSON.stringify(v, null, 2)
+      return JSON.stringify(v, null, 2);
     } catch {
-      return String(v)
+      return String(v);
     }
   }
-  if (typeof v === 'string') return v
-  return String(v)
-})
+  if (typeof v === 'string') return v;
+  return String(v);
+});
 
 const isTreeable = computed(
-  () =>
-    props.value !== null &&
-    typeof props.value === 'object' &&
-    !(props.value instanceof Date) &&
-    !(props.value instanceof RegExp)
-)
+  () => props.value !== null && typeof props.value === 'object' && !(props.value instanceof Date) && !(props.value instanceof RegExp),
+);
 
 function sortObjectKeys(obj: unknown): unknown {
-  if (obj === null || typeof obj !== 'object') return obj
-  if (Array.isArray(obj)) return obj.map(sortObjectKeys)
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sortObjectKeys);
   return Object.keys(obj)
     .sort()
     .reduce(
       (acc, key) => {
-        acc[key] = sortObjectKeys((obj as Record<string, unknown>)[key])
-        return acc
+        acc[key] = sortObjectKeys((obj as Record<string, unknown>)[key]);
+        return acc;
       },
-      {} as Record<string, unknown>
-    )
+      {} as Record<string, unknown>,
+    );
 }
 
-const sortedValue = computed(() =>
-  isTreeable.value ? sortObjectKeys(props.value) : props.value
-)
+const sortedValue = computed(() => (isTreeable.value ? sortObjectKeys(props.value) : props.value));
 
 const rawParts = computed(() => {
-  const text = rawText.value
-  const q = props.search?.trim()
-  if (!q || !text) return [{ match: false, text }]
-  const lower = text.toLowerCase()
-  const lowerQ = q.toLowerCase()
-  const out: { match: boolean; text: string }[] = []
-  let start = 0
-  let i = lower.indexOf(lowerQ, start)
+  const text = rawText.value;
+  const q = props.search?.trim();
+  if (!q || !text) return [{ match: false, text }];
+  const lower = text.toLowerCase();
+  const lowerQ = q.toLowerCase();
+  const out: { match: boolean; text: string }[] = [];
+  let start = 0;
+  let i = lower.indexOf(lowerQ, start);
   while (i !== -1) {
     if (i > start) {
-      out.push({ match: false, text: text.slice(start, i) })
+      out.push({ match: false, text: text.slice(start, i) });
     }
-    out.push({ match: true, text: text.slice(i, i + q.length) })
-    start = i + q.length
-    i = lower.indexOf(lowerQ, start)
+    out.push({ match: true, text: text.slice(i, i + q.length) });
+    start = i + q.length;
+    i = lower.indexOf(lowerQ, start);
   }
   if (start < text.length) {
-    out.push({ match: false, text: text.slice(start) })
+    out.push({ match: false, text: text.slice(start) });
   }
-  return out
-})
+  return out;
+});
 
-const { copy, copied } = useClipboard({ copiedDuring: 2000 })
-const toast = useToast()
+const { copy, copied } = useClipboard({ copiedDuring: 2000 });
+const toast = useToast();
 
 function copyText() {
-  copy(rawText.value)
+  copy(rawText.value);
   toast.add({
     title: 'Скопировано',
     color: 'success',
     icon: 'i-lucide-check',
-  })
+  });
 }
 
 const isDark = computed(() => {
   if (import.meta.client && typeof document !== 'undefined') {
-    return document.documentElement.classList.contains('dark')
+    return document.documentElement.classList.contains('dark');
   }
-  return false
-})
+  return false;
+});
 </script>
 
-<style>
-</style>
+<style></style>
