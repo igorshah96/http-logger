@@ -13,10 +13,7 @@ const payload = {
   method: 'GET',
   bffPath: '/bff/orders',
 
-  logDetails: [
-    'BFF request for order details',
-    { feature: 'grouped-table-test', env: 'local' },
-  ],
+  logDetails: ['BFF request for order details', { feature: 'grouped-table-test', env: 'local' }],
 
   axiosRequests: [
     {
@@ -30,6 +27,9 @@ const payload = {
       data: {
         id: 123,
         status: 'SHIPPED',
+        items: Array(1000)
+          .fill()
+          .map((_, index) => ({ label: `label${index}`, value: `value${index}` })),
       },
       timestamp: Date.now() - 1500,
     },
@@ -58,9 +58,7 @@ const payload = {
     data: {
       id: 123,
       status: 'PARTIALLY_SHIPPED',
-      errors: [
-        { service: 'notifications', code: 'DOWNSTREAM_UNAVAILABLE' },
-      ],
+      errors: [{ service: 'notifications', code: 'DOWNSTREAM_UNAVAILABLE' }],
     },
   },
 
@@ -80,9 +78,7 @@ const payload = {
 };
 
 async function sendLog() {
-  console.log(
-    'Отправка тестового лога с axiosRequests на http://localhost:4444...',
-  );
+  console.log('Отправка тестового лога с axiosRequests на http://localhost:4444...');
 
   try {
     const response = await fetch('http://localhost:4443/api/logs', {
@@ -106,19 +102,13 @@ async function sendLog() {
     }
 
     if (response.ok) {
-      console.log(
-        'Успех! Открой интерфейс http-logger и проверь, что видна одна BFF-строка и две вложенные axios-строки.',
-      );
+      console.log('Успех! Открой интерфейс http-logger и проверь, что видна одна BFF-строка и две вложенные axios-строки.');
     } else {
       console.log('Произошла ошибка при отправке.');
     }
   } catch (error) {
-    console.error(
-      'Ошибка соединения с сервером (убедитесь, что http-logger запущен):',
-      error.message,
-    );
+    console.error('Ошибка соединения с сервером (убедитесь, что http-logger запущен):', error.meszsage);
   }
 }
 
 sendLog();
-

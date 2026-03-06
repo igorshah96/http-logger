@@ -2,8 +2,11 @@
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt'],
 
-  build: {
-    transpile: ['vue']
+  vite: {
+    ssr: {
+      // Bundle 'entities' so ESM named exports are resolved (avoids "does not provide an export named default" in server build)
+      noExternal: ['entities'],
+    },
   },
 
   imports: {
@@ -11,29 +14,29 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: true
+    enabled: true,
   },
 
   css: ['~/assets/css/main.css'],
 
   routeRules: {
-    '/': { ssr: true }
+    '/': { ssr: true },
   },
 
   compatibilityDate: '2025-01-15',
 
   nitro: {
     experimental: {
-      websocket: true
-    }
+      websocket: true,
+    },
   },
 
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
-  }
-})
+        braceStyle: '1tbs',
+      },
+    },
+  },
+});
