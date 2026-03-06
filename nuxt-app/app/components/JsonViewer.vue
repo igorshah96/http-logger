@@ -76,7 +76,7 @@
       </template>
       <template v-else>
         <template v-if="isTreeable">
-          <JsonTree :value="sortedValue" />
+          <JsonTree :value="sortedValue" :default-expanded="defaultExpanded" />
         </template>
         <template v-else>
           <pre class="whitespace-pre-wrap break-words text-default">{{ rawText || 'Нет данных' }}</pre>
@@ -98,6 +98,7 @@
           :value="value"
           :search="search"
           :initial-view-mode="viewMode"
+          :default-expanded="defaultExpanded"
           standalone
           @close="fullscreenOpen = false"
         />
@@ -116,8 +117,10 @@ const props = withDefaults(
     search?: string
     standalone?: boolean
     initialViewMode?: 'raw' | 'transformed'
+    /** По умолчанию false — все узлы дерева свёрнуты */
+    defaultExpanded?: boolean
   }>(),
-  { standalone: false }
+  { standalone: false, defaultExpanded: false }
 )
 
 const emit = defineEmits<{

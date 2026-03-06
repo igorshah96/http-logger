@@ -60,6 +60,7 @@
         :label="child.key"
         :value="child.value"
         :level="level + 1"
+        :default-expanded="defaultExpanded"
       />
     </div>
   </div>
@@ -72,11 +73,15 @@ defineOptions({
   name: 'JsonTree',
 })
 
-const props = defineProps<{
-  value: unknown
-  label?: string
-  level?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    value: unknown
+    label?: string
+    level?: number
+    defaultExpanded?: boolean
+  }>(),
+  { defaultExpanded: false }
+)
 
 const indentPerLevel = 1
 
@@ -90,7 +95,7 @@ const isObject = computed(
     !Array.isArray(props.value)
 )
 const expandable = computed(() => isArray.value || isObject.value)
-const open = ref(true)
+const open = ref(props.defaultExpanded)
 
 const entries = computed(() => {
   if (Array.isArray(props.value)) {
