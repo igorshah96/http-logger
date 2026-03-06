@@ -30,6 +30,7 @@ const payload = {
       data: {
         id: 123,
         status: 'SHIPPED',
+        items: Array(1000).fill().map((_,index) => ({label: `label${index}`, value: `value${index}` })),
       },
       timestamp: Date.now() - 1500,
     },

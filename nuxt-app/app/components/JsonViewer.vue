@@ -76,14 +76,7 @@
       </template>
       <template v-else>
         <template v-if="isTreeable">
-          <Vue3JsonViewer
-            :value="value"
-            :theme="isDark ? 'dark' : 'light'"
-            copyable
-            boxed
-            sort
-            class="vjv-custom"
-          />
+          <JsonTree :value="sortedValue" />
         </template>
         <template v-else>
           <pre class="whitespace-pre-wrap break-words text-default">{{ rawText || 'Нет данных' }}</pre>
@@ -116,8 +109,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
-import { JsonViewer as Vue3JsonViewer } from 'vue3-json-viewer'
-import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 
 const props = withDefaults(
   defineProps<{
@@ -169,6 +160,24 @@ const isTreeable = computed(
     !(props.value instanceof RegExp)
 )
 
+function sortObjectKeys(obj: unknown): unknown {
+  if (obj === null || typeof obj !== 'object') return obj
+  if (Array.isArray(obj)) return obj.map(sortObjectKeys)
+  return Object.keys(obj)
+    .sort()
+    .reduce(
+      (acc, key) => {
+        acc[key] = sortObjectKeys((obj as Record<string, unknown>)[key])
+        return acc
+      },
+      {} as Record<string, unknown>
+    )
+}
+
+const sortedValue = computed(() =>
+  isTreeable.value ? sortObjectKeys(props.value) : props.value
+)
+
 const rawParts = computed(() => {
   const text = rawText.value
   const q = props.search?.trim()
@@ -213,9 +222,4 @@ const isDark = computed(() => {
 </script>
 
 <style>
-.vjv-custom {
-  --jv-background-color: transparent;
-  --jv-font-family: ui-monospace, monospace;
-  --jv-font-size: 0.75rem;
-}
 </style>
