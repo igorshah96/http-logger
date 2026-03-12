@@ -20,6 +20,7 @@ const payload = {
       url: 'https://backend.example.com/internal/orders/123',
       params: 'include=items,customer',
       code: 200,
+      method: 'get',
       message: 'OK',
       body: {
         correlationId: 'corr-1',
